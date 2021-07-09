@@ -1,8 +1,7 @@
 use crate::api::movie::MovieBuilder;
 use crate::api::network::NetworkHandler;
-use crate::from_response::FromResponse;
 use reqwest::{header, Client, Url};
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -30,11 +29,11 @@ impl Tmdb {
         }
     }
 
-    pub async fn get<A, S, R>(&self, path: A, parameters: Option<&S>) -> Result<R, reqwest::Error>
+    pub async fn get<A, S, D>(&self, path: A, parameters: Option<&S>) -> Result<D, reqwest::Error>
     where
         A: AsRef<str>,
         S: Serialize + ?Sized,
-        R: FromResponse,
+        D: DeserializeOwned,
     {
         let url = self.base_url.join(path.as_ref()).unwrap();
 
@@ -46,7 +45,9 @@ impl Tmdb {
 
         let response = request.send().await?;
 
-        R::from(response).await
+        let text = response.text().await?;
+        let de = &mut serde_json::Deserializer::from_str(&text);
+        Ok(D::deserialize(de).expect("error in the trait"))
     }
 }
 
