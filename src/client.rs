@@ -1,4 +1,5 @@
 use crate::api::movie::MovieBuilder;
+use crate::api::network::NetworkHandler;
 use crate::from_response::FromResponse;
 use reqwest::{header, Client, Url};
 use serde::Serialize;
@@ -52,5 +53,9 @@ impl Tmdb {
 impl Tmdb {
     pub fn movie(&self, id: u64) -> MovieBuilder {
         MovieBuilder::new(self, id)
+    }
+
+    pub fn network(&self, id: u64) -> NetworkHandler {
+        NetworkHandler::new(self, id)
     }
 }
