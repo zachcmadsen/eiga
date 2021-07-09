@@ -71,3 +71,41 @@ pub struct AlternativeTitles {
     pub id: u64,
     pub titles: Vec<Title>,
 }
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub struct Cast {
+    pub adult: Option<bool>,
+    pub gender: Option<Option<u64>>,
+    pub id: Option<u64>,
+    pub known_for_department: Option<String>,
+    pub name: Option<String>,
+    pub original_name: Option<String>,
+    pub popularity: Option<f64>,
+    pub profile_path: Option<Option<String>>,
+    pub cast_id: Option<u64>,
+    pub character: Option<String>,
+    pub credit_id: Option<String>,
+    pub order: Option<u64>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub struct Crew {
+    pub adult: Option<bool>,
+    pub gender: Option<Option<u64>>,
+    pub id: Option<u64>,
+    pub known_for_department: Option<String>,
+    pub name: Option<String>,
+    pub original_name: Option<String>,
+    pub popularity: Option<f64>,
+    pub profile_path: Option<Option<String>>,
+    pub credit_id: Option<String>,
+    pub department: Option<String>,
+    pub job: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub struct Credits {
+    pub id: Option<u64>,
+    pub cast: Option<Vec<Cast>>,
+    pub crew: Option<Vec<Crew>>,
+}

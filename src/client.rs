@@ -19,6 +19,7 @@ impl Tmdb {
 
         headers.insert(header::AUTHORIZATION, auth);
 
+        // TODO: Should I add a User-Agent header?
         let client = Client::builder().default_headers(headers).build().unwrap();
 
         // TODO: Add a TmdbBuilder if there are enough configurations.
