@@ -27,7 +27,7 @@ pub struct SpokenLanguage {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
-pub struct MovieDetails {
+pub struct Details {
     pub adult: Option<bool>,
     pub backdrop_path: Option<String>,
     // TODO: Add `belongs_to_collection` once we add the collection model.
@@ -48,8 +48,6 @@ pub struct MovieDetails {
     pub revenue: Option<u64>,
     pub runtime: Option<u64>,
     pub spoken_languages: Option<Vec<SpokenLanguage>>,
-    // TODO: Consider changing this to an enum since `status` only has six
-    // allowed values.
     pub status: Option<String>,
     pub tagline: Option<String>,
     pub title: Option<String>,

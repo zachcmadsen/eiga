@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
-pub struct NetworkDetails {
+pub struct Details {
     pub headquarters: Option<String>,
     pub homepage: Option<String>,
     pub id: Option<u64>,
@@ -11,7 +11,7 @@ pub struct NetworkDetails {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
-pub struct AlternativeNameResult {
+pub struct AlternativeName {
     pub name: Option<String>,
     #[serde(rename = "type")]
     pub _type: Option<String>,
@@ -20,7 +20,7 @@ pub struct AlternativeNameResult {
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct AlternativeNames {
     pub id: Option<u64>,
-    pub results: Option<Vec<AlternativeNameResult>>,
+    pub results: Option<Vec<AlternativeName>>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
