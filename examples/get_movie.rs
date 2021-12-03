@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use eiga::api::movie::Movie;
 use eiga::Client;
 use eiga::Tmdb;
