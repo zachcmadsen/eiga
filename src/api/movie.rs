@@ -7,12 +7,12 @@ use crate::query::QueryPairs;
 
 /// A builder for `Movie`.
 pub struct MovieBuilder<'a> {
-    id: usize,
+    id: u32,
     language: Option<&'a str>,
 }
 
 impl<'a> MovieBuilder<'a> {
-    pub(crate) fn new(id: usize) -> MovieBuilder<'a> {
+    pub(crate) fn new(id: u32) -> MovieBuilder<'a> {
         MovieBuilder { id, language: None }
     }
 
@@ -77,7 +77,7 @@ impl<'a> MovieBuilder<'a> {
 /// # };
 /// ```
 pub struct Movie<'a> {
-    id: usize,
+    id: u32,
     language: Option<&'a str>,
 }
 
@@ -91,7 +91,7 @@ impl<'a> Movie<'a> {
     ///
     /// let movie_endpoint_builder = Movie::builder(42);
     /// ```
-    pub fn builder(id: usize) -> MovieBuilder<'a> {
+    pub fn builder(id: u32) -> MovieBuilder<'a> {
         MovieBuilder::new(id)
     }
 }

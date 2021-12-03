@@ -8,11 +8,11 @@ use crate::{endpoint::Endpoint, query::QueryPairs};
 pub struct SearchMovieBuilder<'a> {
     query: &'a str,
     language: Option<&'a str>,
-    page: Option<usize>,
+    page: Option<u32>,
     include_adult: Option<bool>,
     region: Option<&'a str>,
-    year: Option<usize>,
-    primary_release_year: Option<usize>,
+    year: Option<u32>,
+    primary_release_year: Option<u32>,
 }
 
 impl<'a> SearchMovieBuilder<'a> {
@@ -38,7 +38,7 @@ impl<'a> SearchMovieBuilder<'a> {
     }
 
     /// Sets the `page` query string parameter.
-    pub fn page(&mut self, page: usize) -> &mut SearchMovieBuilder<'a> {
+    pub fn page(&mut self, page: u32) -> &mut SearchMovieBuilder<'a> {
         self.page = Some(page);
         self
     }
@@ -59,7 +59,7 @@ impl<'a> SearchMovieBuilder<'a> {
     }
 
     /// Sets the `year` query string parameter.
-    pub fn year(&mut self, year: usize) -> &mut SearchMovieBuilder<'a> {
+    pub fn year(&mut self, year: u32) -> &mut SearchMovieBuilder<'a> {
         self.year = Some(year);
         self
     }
@@ -67,7 +67,7 @@ impl<'a> SearchMovieBuilder<'a> {
     /// Sets the `primary_release_year` query string parameter.
     pub fn primary_release_year(
         &mut self,
-        primary_release_year: usize,
+        primary_release_year: u32,
     ) -> &mut SearchMovieBuilder<'a> {
         self.primary_release_year = Some(primary_release_year);
         self
@@ -103,11 +103,11 @@ impl<'a> SearchMovieBuilder<'a> {
 pub struct SearchMovie<'a> {
     query: &'a str,
     language: Option<&'a str>,
-    page: Option<usize>,
+    page: Option<u32>,
     include_adult: Option<bool>,
     region: Option<&'a str>,
-    year: Option<usize>,
-    primary_release_year: Option<usize>,
+    year: Option<u32>,
+    primary_release_year: Option<u32>,
 }
 
 impl<'a> SearchMovie<'a> {

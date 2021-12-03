@@ -1,10 +1,9 @@
 use serde::{ser::SerializeSeq, Serialize, Serializer};
 
 /// The type of a query string parameter value.
-#[derive(Serialize)]
 pub enum Value<'a> {
     String(&'a str),
-    Int(usize),
+    Int(u32),
     Bool(bool),
 }
 
@@ -14,8 +13,8 @@ impl<'a> From<&'a str> for Value<'a> {
     }
 }
 
-impl<'a> From<usize> for Value<'a> {
-    fn from(value: usize) -> Self {
+impl<'a> From<u32> for Value<'a> {
+    fn from(value: u32) -> Self {
         Value::Int(value)
     }
 }
@@ -23,6 +22,19 @@ impl<'a> From<usize> for Value<'a> {
 impl<'a> From<bool> for Value<'a> {
     fn from(value: bool) -> Self {
         Value::Bool(value)
+    }
+}
+
+impl<'a> Serialize for Value<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Value::String(s) => serializer.serialize_str(s),
+            Value::Int(i) => serializer.serialize_u32(*i),
+            Value::Bool(b) => serializer.serialize_bool(*b),
+        }
     }
 }
 
