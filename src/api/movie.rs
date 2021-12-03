@@ -1,95 +1,113 @@
-use crate::client::Tmdb;
-use crate::models::movie::*;
-use serde::Serialize;
+use std::borrow::Cow;
 
-#[derive(Serialize)]
+use http::Method;
+
+use crate::endpoint::Endpoint;
+use crate::query::QueryPairs;
+
+/// A builder for `Movie`.
 pub struct MovieBuilder<'a> {
-    #[serde(skip_serializing)]
-    tmdb: &'a Tmdb,
-    #[serde(skip_serializing)]
-    id: u64,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    language: Option<String>,
+    id: usize,
+    language: Option<&'a str>,
 }
 
 impl<'a> MovieBuilder<'a> {
-    pub(crate) fn new(tmdb: &'a Tmdb, id: u64) -> MovieBuilder {
-        MovieBuilder {
-            tmdb,
-            id,
-            language: None,
-        }
+    pub(crate) fn new(id: usize) -> MovieBuilder<'a> {
+        MovieBuilder { id, language: None }
     }
 
-    pub fn alternative_titles(&self) -> AlternativeTitlesBuilder {
-        AlternativeTitlesBuilder::new(self)
-    }
-
-    pub fn credits(&self) -> CreditsBuilder {
-        CreditsBuilder::new(self)
-    }
-
-    pub async fn get(&self) -> Result<Details, reqwest::Error> {
-        let route = format!("movie/{}", self.id);
-        self.tmdb.get(route, Some(self)).await
-    }
-
-    pub fn language(mut self, language: String) -> MovieBuilder<'a> {
+    /// Sets the `language` query string parameter.
+    ///
+    /// # Example
+    /// 
+    /// Set the language to English:
+    ///
+    /// ```
+    /// use eiga::api::movie::Movie;
+    ///
+    /// let movie_endpoint = Movie::builder(42).language("en").build();
+    /// ```
+    pub fn language(&mut self, language: &'a str) -> &mut MovieBuilder<'a> {
         self.language = Some(language);
         self
     }
-}
 
-#[derive(Serialize)]
-pub struct AlternativeTitlesBuilder<'a> {
-    #[serde(skip_serializing)]
-    movie: &'a MovieBuilder<'a>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    country: Option<String>,
-}
-
-impl<'a> AlternativeTitlesBuilder<'a> {
-    fn new(movie: &'a MovieBuilder<'a>) -> AlternativeTitlesBuilder<'a> {
-        AlternativeTitlesBuilder {
-            movie,
-            country: None,
+    /// Builds a new `Movie` based on the current configuration.
+    ///
+    /// # Example
+    /// 
+    /// Build a movie endpoint for *House* (1977):
+    ///
+    /// ```
+    /// use eiga::api::movie::Movie;
+    ///
+    /// let house_id = 5030;
+    /// let movie_endpoint = Movie::builder(house_id).build();
+    /// ```
+    pub fn build(&self) -> Movie<'a> {
+        Movie {
+            id: self.id,
+            language: self.language,
         }
     }
+}
 
-    pub async fn get(&self) -> Result<AlternativeTitles, reqwest::Error> {
-        let route = format!("movie/{}/alternative_titles", self.movie.id);
-        self.movie.tmdb.get(route, Some(self)).await
-    }
+/// The endpoint to fetch the details of a movie.
+///
+/// # Example
+///
+/// Get details of *Cure* (1997):
+///
+/// ```no_run
+/// use eiga::api::movie::Movie;
+/// use eiga::client::Client;
+/// use eiga::tmdb::Tmdb;
+///
+/// # async {
+/// # #[derive(serde::Deserialize)]
+/// # struct MovieDetails;
+/// let client = Tmdb::from_env()?;
+///
+/// let cure_id = 402;
+/// let movie_endpoint = Movie::builder(cure_id).build();
+///
+/// // MovieDetails is a user-defined struct.
+/// let movie_details: MovieDetails = client.send(&movie_endpoint).await?;
+/// # Ok::<(), eiga::error::Error>(())
+/// # };
+/// ```
+pub struct Movie<'a> {
+    id: usize,
+    language: Option<&'a str>,
+}
 
-    pub fn country(mut self, country: String) -> AlternativeTitlesBuilder<'a> {
-        self.country = Some(country);
-        self
+impl<'a> Movie<'a> {
+    /// Constructs a new `MovieBuilder` from the given movie ID.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eiga::api::movie::Movie;
+    ///
+    /// let movie_endpoint_builder = Movie::builder(42);
+    /// ```
+    pub fn builder(id: usize) -> MovieBuilder<'a> {
+        MovieBuilder::new(id)
     }
 }
 
-#[derive(Serialize)]
-pub struct CreditsBuilder<'a> {
-    #[serde(skip_serializing)]
-    movie: &'a MovieBuilder<'a>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    language: Option<String>,
-}
-
-impl<'a> CreditsBuilder<'a> {
-    fn new(movie: &'a MovieBuilder<'a>) -> CreditsBuilder<'a> {
-        CreditsBuilder {
-            movie,
-            language: None,
-        }
+impl<'a> Endpoint for Movie<'a> {
+    fn method(&self) -> Method {
+        Method::GET
     }
 
-    pub async fn get(&self) -> Result<Credits, reqwest::Error> {
-        let route = format!("movie/{}/alternative_titles", self.movie.id);
-        self.movie.tmdb.get(route, Some(self)).await
+    fn path(&self) -> Cow<'static, str> {
+        format!("movie/{}", self.id).into()
     }
 
-    pub fn language(mut self, language: String) -> CreditsBuilder<'a> {
-        self.language = Some(language);
-        self
+    fn parameters(&self) -> QueryPairs {
+        let mut parameters = QueryPairs::new();
+        parameters.push("language", self.language);
+        parameters
     }
 }
