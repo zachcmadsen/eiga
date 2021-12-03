@@ -33,7 +33,7 @@ use crate::error::Error;
 ///
 /// // Create an endpoint to fetch the details of Harakiri (1962).
 /// let harakiri_id = 402;
-/// let movie_endpoint = Movie::new(harakiri_id);
+/// let movie_endpoint = Movie::builder(harakiri_id).build();
 ///
 /// // Send the request! Note that MovieDetails is a user-defined struct.
 /// let movie_details: MovieDetails = client.send(&movie_endpoint).await?;
