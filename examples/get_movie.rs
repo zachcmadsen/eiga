@@ -8,7 +8,7 @@ use serde::Deserialize;
 // `eiga` doesn't provide models for TMDB responses. Instead, users create
 // their own structs with only the fields they want. The structs just need to
 // implement `Deserialize`. This struct is based off the response schema of
-// the GET movie details endpoint:
+// the get movie details endpoint:
 // https://developers.themoviedb.org/3/movies/get-movie-details.
 #[derive(Debug, Deserialize)]
 struct MovieDetails {
