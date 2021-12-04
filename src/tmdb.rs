@@ -144,13 +144,13 @@ impl Client for Tmdb {
             .send()
             .await?;
 
-        // TODO: Figure out the format of TMDB error responses.
-        if !response.status().is_success() {
-            todo!();
+        let status = response.status();
+        let body = response.bytes().await?;
+
+        if !status.is_success() {
+            return Err(Error::from_tmdb(&body));
         }
 
-        let body = serde_json::from_slice(&response.bytes().await?)?;
-
-        serde_json::from_value::<D>(body).map_err(Error::Json)
+        serde_json::from_slice::<D>(&body).map_err(Error::Json)
     }
 }
