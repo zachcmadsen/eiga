@@ -23,7 +23,7 @@ pub struct MovieBuilder<'a> {
 }
 
 impl<'a> MovieBuilder<'a> {
-    pub(crate) fn new(id: u32) -> MovieBuilder<'a> {
+    fn new(id: u32) -> MovieBuilder<'a> {
         MovieBuilder { id, language: None }
     }
 

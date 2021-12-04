@@ -6,7 +6,7 @@ use crate::error::Error;
 
 /// A trait for objects that send requests asynchronously.
 ///
-/// There's an alternative trait for blocking clients: `blocking::Client`.
+/// There's an alternative trait for "blocking" clients: `blocking::Client`.
 ///
 /// Clients are defined by one method, `send`. The `send` method will send a
 /// request to some endpoint and return the response.

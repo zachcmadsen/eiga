@@ -29,7 +29,7 @@ pub struct SearchMovieBuilder<'a> {
 }
 
 impl<'a> SearchMovieBuilder<'a> {
-    pub(crate) fn new(query: &'a str) -> SearchMovieBuilder<'a> {
+    fn new(query: &'a str) -> SearchMovieBuilder<'a> {
         SearchMovieBuilder {
             query,
             language: None,

@@ -17,7 +17,7 @@ pub struct TmdbBuilder<'a> {
 }
 
 impl<'a> TmdbBuilder<'a> {
-    pub(crate) fn new<S>(token: S) -> TmdbBuilder<'a>
+    fn new<S>(token: S) -> TmdbBuilder<'a>
     where
         S: Into<String>,
     {
@@ -27,7 +27,7 @@ impl<'a> TmdbBuilder<'a> {
         }
     }
 
-    pub(crate) fn from_env() -> Result<TmdbBuilder<'a>, Error> {
+    fn from_env() -> Result<TmdbBuilder<'a>, Error> {
         let token = env::var("TMDB_TOKEN").unwrap();
         Ok(TmdbBuilder::new(token))
     }
@@ -102,7 +102,8 @@ impl Tmdb {
     ///
     /// # Errors
     ///
-    /// This function returns an error if the environment variable isn't set.
+    /// This function returns an error if the environment variable isn't set
+    /// or if the token is invalid.
     ///
     /// # Example
     ///

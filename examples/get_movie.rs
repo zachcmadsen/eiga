@@ -33,9 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // variable.
     let tmdb = Tmdb::from_env()?;
 
-    // Build an endpoint to fetch details about Reservoir Dogs. Note that
-    // specifying the language is optional. Most endpoints have optional
-    // parameters that can be configured by their builders.
+    // Build an endpoint to fetch details about Reservoir Dogs.
     let reservoir_dogs_id = 500;
     let movie_endpoint =
         Movie::builder(reservoir_dogs_id).language("en-US").build();

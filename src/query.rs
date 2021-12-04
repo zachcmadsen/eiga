@@ -2,14 +2,14 @@ use serde::{ser::SerializeSeq, Serialize, Serializer};
 
 /// The type of a query string parameter value.
 pub enum Value<'a> {
-    String(&'a str),
+    Str(&'a str),
     Int(u32),
     Bool(bool),
 }
 
 impl<'a> From<&'a str> for Value<'a> {
     fn from(value: &'a str) -> Self {
-        Value::String(value)
+        Value::Str(value)
     }
 }
 
@@ -31,7 +31,7 @@ impl<'a> Serialize for Value<'a> {
         S: Serializer,
     {
         match self {
-            Value::String(s) => serializer.serialize_str(s),
+            Value::Str(s) => serializer.serialize_str(s),
             Value::Int(i) => serializer.serialize_u32(*i),
             Value::Bool(b) => serializer.serialize_bool(*b),
         }
