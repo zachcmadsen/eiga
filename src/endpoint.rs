@@ -11,9 +11,9 @@ use crate::query::QueryPairs;
 /// not in the crate, all you have to do is implement this trait. Then you can
 /// send requests to the endpoint with `Tmdb` (or another type that implements
 /// `Client`).
-/// 
+///
 /// # Example
-/// 
+///
 /// TODO: Add an example that shows how to implement this for a new endpoint.
 pub trait Endpoint {
     fn method(&self) -> Method;

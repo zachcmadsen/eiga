@@ -35,7 +35,7 @@ impl Error {
     /// Converts an error response from TMDB into an `Error`.
     pub fn from_tmdb(body: &[u8]) -> Error {
         match serde_json::from_slice::<TmdbError>(body) {
-            Ok(err) => Error::Tmdb(err),
+            Ok(body) => Error::Tmdb(body),
             Err(err) => Error::Json(err),
         }
     }

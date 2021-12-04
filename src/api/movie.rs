@@ -6,6 +6,17 @@ use crate::endpoint::Endpoint;
 use crate::query::QueryPairs;
 
 /// A builder for `Movie`.
+///
+/// # Example
+///
+/// Build a movie endpoint for *House* (1977):
+///
+/// ```
+/// use eiga::api::movie::Movie;
+///
+/// let house_id = 5030;
+/// let movie_endpoint = Movie::builder(house_id).build();
+/// ```
 pub struct MovieBuilder<'a> {
     id: u32,
     language: Option<&'a str>,
@@ -17,33 +28,12 @@ impl<'a> MovieBuilder<'a> {
     }
 
     /// Sets the `language` query string parameter.
-    ///
-    /// # Example
-    /// 
-    /// Set the language to English:
-    ///
-    /// ```
-    /// use eiga::api::movie::Movie;
-    ///
-    /// let movie_endpoint = Movie::builder(42).language("en").build();
-    /// ```
     pub fn language(&mut self, language: &'a str) -> &mut MovieBuilder<'a> {
         self.language = Some(language);
         self
     }
 
     /// Builds a new `Movie` based on the current configuration.
-    ///
-    /// # Example
-    /// 
-    /// Build a movie endpoint for *House* (1977):
-    ///
-    /// ```
-    /// use eiga::api::movie::Movie;
-    ///
-    /// let house_id = 5030;
-    /// let movie_endpoint = Movie::builder(house_id).build();
-    /// ```
     pub fn build(&self) -> Movie<'a> {
         Movie {
             id: self.id,

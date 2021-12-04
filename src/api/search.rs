@@ -5,6 +5,19 @@ use http::Method;
 use crate::{endpoint::Endpoint, query::QueryPairs};
 
 /// A builder for `SearchMovie`.
+///
+/// # Example
+///
+/// Build an endpoint to search for *Kwaidan* (1966):
+///
+/// ```
+/// use eiga::api::search::SearchMovie;
+///
+/// let search_movie_endpoint = SearchMovie::builder("Kwaidan")
+///     .language("en")
+///     .page(2)
+///     .build();
+/// ```
 pub struct SearchMovieBuilder<'a> {
     query: &'a str,
     language: Option<&'a str>,
@@ -74,19 +87,6 @@ impl<'a> SearchMovieBuilder<'a> {
     }
 
     /// Builds a new `SearchMovie` based on the current configuration.
-    ///
-    /// # Example
-    /// 
-    /// Build an endpoint to search for *Kwaidan* (1966):
-    ///
-    /// ```
-    /// use eiga::api::search::SearchMovie;
-    ///
-    /// let search_movie_endpoint = SearchMovie::builder("Kwaidan")
-    ///     .language("en")
-    ///     .page(2)
-    ///     .build();
-    /// ```
     pub fn build(&self) -> SearchMovie<'a> {
         SearchMovie {
             query: self.query,
