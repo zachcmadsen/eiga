@@ -4,21 +4,21 @@ use http::Method;
 
 use crate::{endpoint::Endpoint, query::QueryPairs};
 
-/// A builder for `SearchMovie`.
+/// A builder for `Movie`.
 ///
 /// # Example
 ///
 /// Build an endpoint to search for *Kwaidan* (1966):
 ///
 /// ```
-/// use eiga::api::search::SearchMovie;
+/// use eiga::api::search;
 ///
-/// let search_movie_endpoint = SearchMovie::builder("Kwaidan")
+/// let search_movie_endpoint = search::Movie::builder("Kwaidan")
 ///     .language("en")
 ///     .page(2)
 ///     .build();
 /// ```
-pub struct SearchMovieBuilder<'a> {
+pub struct MovieBuilder<'a> {
     query: &'a str,
     language: Option<&'a str>,
     page: Option<u32>,
@@ -28,9 +28,9 @@ pub struct SearchMovieBuilder<'a> {
     primary_release_year: Option<u32>,
 }
 
-impl<'a> SearchMovieBuilder<'a> {
-    fn new(query: &'a str) -> SearchMovieBuilder<'a> {
-        SearchMovieBuilder {
+impl<'a> MovieBuilder<'a> {
+    fn new(query: &'a str) -> MovieBuilder<'a> {
+        MovieBuilder {
             query,
             language: None,
             page: None,
@@ -42,16 +42,13 @@ impl<'a> SearchMovieBuilder<'a> {
     }
 
     /// Sets the `language` query string parameter.
-    pub fn language(
-        &mut self,
-        language: &'a str,
-    ) -> &mut SearchMovieBuilder<'a> {
+    pub fn language(&mut self, language: &'a str) -> &mut MovieBuilder<'a> {
         self.language = Some(language);
         self
     }
 
     /// Sets the `page` query string parameter.
-    pub fn page(&mut self, page: u32) -> &mut SearchMovieBuilder<'a> {
+    pub fn page(&mut self, page: u32) -> &mut MovieBuilder<'a> {
         self.page = Some(page);
         self
     }
@@ -60,19 +57,19 @@ impl<'a> SearchMovieBuilder<'a> {
     pub fn include_adult(
         &mut self,
         include_adult: bool,
-    ) -> &mut SearchMovieBuilder<'a> {
+    ) -> &mut MovieBuilder<'a> {
         self.include_adult = Some(include_adult);
         self
     }
 
     /// Sets the `region` query string parameter.
-    pub fn region(&mut self, region: &'a str) -> &mut SearchMovieBuilder<'a> {
+    pub fn region(&mut self, region: &'a str) -> &mut MovieBuilder<'a> {
         self.region = Some(region);
         self
     }
 
     /// Sets the `year` query string parameter.
-    pub fn year(&mut self, year: u32) -> &mut SearchMovieBuilder<'a> {
+    pub fn year(&mut self, year: u32) -> &mut MovieBuilder<'a> {
         self.year = Some(year);
         self
     }
@@ -81,14 +78,14 @@ impl<'a> SearchMovieBuilder<'a> {
     pub fn primary_release_year(
         &mut self,
         primary_release_year: u32,
-    ) -> &mut SearchMovieBuilder<'a> {
+    ) -> &mut MovieBuilder<'a> {
         self.primary_release_year = Some(primary_release_year);
         self
     }
 
-    /// Builds a new `SearchMovie` based on the current configuration.
-    pub fn build(&self) -> SearchMovie<'a> {
-        SearchMovie {
+    /// Builds a new `Movie` based on the current configuration.
+    pub fn build(&self) -> Movie<'a> {
+        Movie {
             query: self.query,
             language: self.language,
             page: self.page,
@@ -100,7 +97,7 @@ impl<'a> SearchMovieBuilder<'a> {
     }
 }
 
-pub struct SearchMovie<'a> {
+pub struct Movie<'a> {
     query: &'a str,
     language: Option<&'a str>,
     page: Option<u32>,
@@ -110,14 +107,14 @@ pub struct SearchMovie<'a> {
     primary_release_year: Option<u32>,
 }
 
-impl<'a> SearchMovie<'a> {
-    /// Constructs a new `SearchMovieBuilder` from the given query.
-    pub fn builder(query: &'a str) -> SearchMovieBuilder<'a> {
-        SearchMovieBuilder::new(query)
+impl<'a> Movie<'a> {
+    /// Constructs a new `MovieBuilder` from the given query.
+    pub fn builder(query: &'a str) -> MovieBuilder<'a> {
+        MovieBuilder::new(query)
     }
 }
 
-impl<'a> Endpoint for SearchMovie<'a> {
+impl<'a> Endpoint for Movie<'a> {
     fn method(&self) -> http::Method {
         Method::GET
     }

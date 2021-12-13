@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use eiga::api::movie::Movie;
+use eiga::api::movie;
 use eiga::Client;
 use eiga::Tmdb;
 use serde::Deserialize;
@@ -35,10 +35,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Build an endpoint to fetch details about Reservoir Dogs.
     let reservoir_dogs_id = 500;
-    let movie_endpoint =
-        Movie::builder(reservoir_dogs_id).language("en-US").build();
+    let movie_details_endpoint = movie::Details::builder(reservoir_dogs_id)
+        .language("en-US")
+        .build();
 
-    let movie_details: MovieDetails = tmdb.send(&movie_endpoint).await?;
+    let movie_details: MovieDetails =
+        tmdb.send(&movie_details_endpoint).await?;
 
     println!("{:#?}", movie_details);
 

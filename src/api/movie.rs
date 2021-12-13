@@ -5,37 +5,37 @@ use http::Method;
 use crate::endpoint::Endpoint;
 use crate::query::QueryPairs;
 
-/// A builder for `Movie`.
+/// A builder for `Details`.
 ///
 /// # Example
 ///
-/// Build a movie endpoint for *House* (1977):
+/// Build a movie details endpoint for *House* (1977):
 ///
 /// ```
-/// use eiga::api::movie::Movie;
+/// use eiga::api::movie;
 ///
 /// let house_id = 5030;
-/// let movie_endpoint = Movie::builder(house_id).build();
+/// let movie_endpoint = movie::Details::builder(house_id).build();
 /// ```
-pub struct MovieBuilder<'a> {
+pub struct DetailsBuilder<'a> {
     id: u32,
     language: Option<&'a str>,
 }
 
-impl<'a> MovieBuilder<'a> {
-    fn new(id: u32) -> MovieBuilder<'a> {
-        MovieBuilder { id, language: None }
+impl<'a> DetailsBuilder<'a> {
+    fn new(id: u32) -> DetailsBuilder<'a> {
+        DetailsBuilder { id, language: None }
     }
 
     /// Sets the `language` query string parameter.
-    pub fn language(&mut self, language: &'a str) -> &mut MovieBuilder<'a> {
+    pub fn language(&mut self, language: &'a str) -> &mut DetailsBuilder<'a> {
         self.language = Some(language);
         self
     }
 
     /// Builds a new `Movie` based on the current configuration.
-    pub fn build(&self) -> Movie<'a> {
-        Movie {
+    pub fn build(&self) -> Details<'a> {
+        Details {
             id: self.id,
             language: self.language,
         }
@@ -49,7 +49,7 @@ impl<'a> MovieBuilder<'a> {
 /// Get details of *Cure* (1997):
 ///
 /// ```no_run
-/// use eiga::api::movie::Movie;
+/// use eiga::api::movie;
 /// use eiga::client::Client;
 /// use eiga::tmdb::Tmdb;
 ///
@@ -59,34 +59,35 @@ impl<'a> MovieBuilder<'a> {
 /// let client = Tmdb::from_env()?;
 ///
 /// let cure_id = 402;
-/// let movie_endpoint = Movie::builder(cure_id).build();
+/// let movie_details_endpoint = movie::Details::builder(cure_id).build();
 ///
 /// // MovieDetails is a user-defined struct.
-/// let movie_details: MovieDetails = client.send(&movie_endpoint).await?;
+/// let movie_details: MovieDetails =
+///     client.send(&movie_details_endpoint).await?;
 /// # Ok::<(), eiga::error::Error>(())
 /// # };
 /// ```
-pub struct Movie<'a> {
+pub struct Details<'a> {
     id: u32,
     language: Option<&'a str>,
 }
 
-impl<'a> Movie<'a> {
-    /// Constructs a new `MovieBuilder` from the given movie ID.
+impl<'a> Details<'a> {
+    /// Constructs a new `DetailsBuilder` from the given movie ID.
     ///
     /// # Example
     ///
     /// ```
-    /// use eiga::api::movie::Movie;
+    /// use eiga::api::movie;
     ///
-    /// let movie_endpoint_builder = Movie::builder(42);
+    /// let movie_details_endpoint_builder = movie::Details::builder(42);
     /// ```
-    pub fn builder(id: u32) -> MovieBuilder<'a> {
-        MovieBuilder::new(id)
+    pub fn builder(id: u32) -> DetailsBuilder<'a> {
+        DetailsBuilder::new(id)
     }
 }
 
-impl<'a> Endpoint for Movie<'a> {
+impl<'a> Endpoint for Details<'a> {
     fn method(&self) -> Method {
         Method::GET
     }
@@ -102,29 +103,26 @@ impl<'a> Endpoint for Movie<'a> {
     }
 }
 
-/// A builder for `MovieCredits`.
-pub struct MovieCreditsBuilder<'a> {
+/// A builder for `Credits`.
+pub struct CreditsBuilder<'a> {
     id: u32,
     language: Option<&'a str>,
 }
 
-impl<'a> MovieCreditsBuilder<'a> {
-    fn new(id: u32) -> MovieCreditsBuilder<'a> {
-        MovieCreditsBuilder { id, language: None }
+impl<'a> CreditsBuilder<'a> {
+    fn new(id: u32) -> CreditsBuilder<'a> {
+        CreditsBuilder { id, language: None }
     }
 
     /// Sets the `language` query string parameter.
-    pub fn language(
-        &mut self,
-        language: &'a str,
-    ) -> &mut MovieCreditsBuilder<'a> {
+    pub fn language(&mut self, language: &'a str) -> &mut CreditsBuilder<'a> {
         self.language = Some(language);
         self
     }
 
-    /// Builds a new `MovieCredits` based on the current configuration.
-    pub fn build(&self) -> MovieCredits<'a> {
-        MovieCredits {
+    /// Builds a new `Credits` based on the current configuration.
+    pub fn build(&self) -> Credits<'a> {
+        Credits {
             id: self.id,
             language: self.language,
         }
@@ -132,19 +130,19 @@ impl<'a> MovieCreditsBuilder<'a> {
 }
 
 /// The endpoint to fetch the credits for a movie.
-pub struct MovieCredits<'a> {
+pub struct Credits<'a> {
     id: u32,
     language: Option<&'a str>,
 }
 
-impl<'a> MovieCredits<'a> {
-    /// Constructs a new `MovieCredits` from the given movie ID.
-    pub fn builder(id: u32) -> MovieCreditsBuilder<'a> {
-        MovieCreditsBuilder::new(id)
+impl<'a> Credits<'a> {
+    /// Constructs a new `CreditsBuilder` from the given movie ID.
+    pub fn builder(id: u32) -> CreditsBuilder<'a> {
+        CreditsBuilder::new(id)
     }
 }
 
-impl<'a> Endpoint for MovieCredits<'a> {
+impl<'a> Endpoint for Credits<'a> {
     fn method(&self) -> Method {
         Method::GET
     }

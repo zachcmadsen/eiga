@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use eiga::api::search::SearchMovie;
+use eiga::api::search;
 use eiga::Client;
 use eiga::Tmdb;
 use serde::Deserialize;
@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build an endpoint to search for a movie called "Kwaidan" released in
     // 1965.
     let search_movie_endpoint =
-        SearchMovie::builder("Kwaidan").year(1965).build();
+        search::Movie::builder("Kwaidan").year(1965).build();
 
     let search_page: MovieSearchPage =
         tmdb.send(&search_movie_endpoint).await?;

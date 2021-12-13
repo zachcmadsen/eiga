@@ -22,7 +22,7 @@ use crate::error::Error;
 /// `Tmdb` implements `Client`:
 ///
 /// ```no_run
-/// use eiga::api::movie::Movie;
+/// use eiga::api::movie;
 /// use eiga::client::Client;
 /// use eiga::tmdb::Tmdb;
 ///
@@ -33,10 +33,11 @@ use crate::error::Error;
 ///
 /// // Create an endpoint to fetch the details of Harakiri (1962).
 /// let harakiri_id = 402;
-/// let movie_endpoint = Movie::builder(harakiri_id).build();
+/// let movie_details_endpoint = movie::Details::builder(harakiri_id).build();
 ///
 /// // Send the request! Note that MovieDetails is a user-defined struct.
-/// let movie_details: MovieDetails = client.send(&movie_endpoint).await?;
+/// let movie_details: MovieDetails =
+///     client.send(&movie_details_endpoint).await?;
 /// # Ok::<(), eiga::error::Error>(())
 /// # };
 /// ```
