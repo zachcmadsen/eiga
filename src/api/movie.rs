@@ -101,3 +101,61 @@ impl<'a> Endpoint for Movie<'a> {
         parameters
     }
 }
+
+/// A builder for `MovieCredits`.
+pub struct MovieCreditsBuilder<'a> {
+    id: u32,
+    language: Option<&'a str>,
+}
+
+impl<'a> MovieCreditsBuilder<'a> {
+    fn new(id: u32) -> MovieCreditsBuilder<'a> {
+        MovieCreditsBuilder { id, language: None }
+    }
+
+    /// Sets the `language` query string parameter.
+    pub fn language(
+        &mut self,
+        language: &'a str,
+    ) -> &mut MovieCreditsBuilder<'a> {
+        self.language = Some(language);
+        self
+    }
+
+    /// Builds a new `MovieCredits` based on the current configuration.
+    pub fn build(&self) -> MovieCredits<'a> {
+        MovieCredits {
+            id: self.id,
+            language: self.language,
+        }
+    }
+}
+
+/// The endpoint to fetch the credits for a movie.
+pub struct MovieCredits<'a> {
+    id: u32,
+    language: Option<&'a str>,
+}
+
+impl<'a> MovieCredits<'a> {
+    /// Constructs a new `MovieCredits` from the given movie ID.
+    pub fn builder(id: u32) -> MovieCreditsBuilder<'a> {
+        MovieCreditsBuilder::new(id)
+    }
+}
+
+impl<'a> Endpoint for MovieCredits<'a> {
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn path(&self) -> Cow<'static, str> {
+        format!("movie/{}/credits", self.id).into()
+    }
+
+    fn parameters(&self) -> QueryPairs {
+        let mut parameters = QueryPairs::new();
+        parameters.push("language", self.language);
+        parameters
+    }
+}
