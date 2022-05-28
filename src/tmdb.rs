@@ -70,16 +70,6 @@ impl Tmdb {
     /// # Errors
     ///
     /// This function returns an error if the token is invalid.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use eiga::Tmdb;
-    ///
-    /// let token = "<token>";
-    /// let tmdb = Tmdb::new(token)?;
-    /// # Ok::<(), eiga::error::Error>(())
-    /// ```
     pub fn new<S>(token: S) -> Result<Tmdb, Error>
     where
         S: Into<String>,
@@ -97,15 +87,6 @@ impl Tmdb {
     ///
     /// This function returns an error if the environment variable isn't set
     /// or if the token is invalid.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use eiga::Tmdb;
-    ///
-    /// let tmdb = Tmdb::from_env()?;
-    /// # Ok::<(), eiga::error::Error>(())
-    /// ```
     pub fn from_env() -> Result<Tmdb, Error> {
         TmdbBuilder::from_env()?.build()
     }
