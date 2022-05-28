@@ -16,31 +16,22 @@ struct MovieDetails {
     original_language: String,
     overview: String,
     release_date: String,
-    spoken_languages: Vec<SpokenLanguage>,
     tagline: Option<String>,
     title: String,
 }
 
-#[derive(Debug, Deserialize)]
-struct SpokenLanguage {
-    iso_639_1: String,
-    name: String,
-}
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build a TMDB client using the token in the TMDB_TOKEN environment
     // variable.
     let tmdb = Tmdb::from_env()?;
 
     // Build an endpoint to fetch details about Reservoir Dogs.
     let reservoir_dogs_id = 500;
-    let movie_details_endpoint = movie::Details::builder(reservoir_dogs_id)
+    let get_movie_details = movie::Details::builder(reservoir_dogs_id)
         .language("en-US")
         .build();
 
-    let movie_details: MovieDetails =
-        tmdb.send(&movie_details_endpoint).await?;
+    let movie_details: MovieDetails = tmdb.send(&get_movie_details)?;
 
     println!("{:#?}", movie_details);
 

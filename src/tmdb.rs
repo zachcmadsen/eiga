@@ -1,8 +1,8 @@
 use std::env;
 
-use async_trait::async_trait;
-use reqwest::{header, Client as AsyncClient, Url};
 use serde::de::DeserializeOwned;
+use ureq::{Agent, Header};
+use url::Url;
 
 use crate::client::Client;
 use crate::endpoint::Endpoint;
@@ -22,8 +22,8 @@ impl<'a> TmdbBuilder<'a> {
         S: Into<String>,
     {
         TmdbBuilder {
-            base_url: None,
             token: token.into(),
+            base_url: None,
         }
     }
 
@@ -42,30 +42,23 @@ impl<'a> TmdbBuilder<'a> {
     pub fn build(&self) -> Result<Tmdb, Error> {
         let base_url = Url::parse(self.base_url.unwrap_or(TMDB_BASE_URL))?;
 
-        let mut headers = header::HeaderMap::new();
-        let mut auth =
-            header::HeaderValue::from_str(&format!("Bearer {}", self.token))?;
-        auth.set_sensitive(true);
-        headers.insert(header::AUTHORIZATION, auth);
+        let auth_header =
+            Header::new("authorization", &format!("Bearer {}", self.token));
 
-        // TODO: Should I add a User-Agent header?
-        let client =
-            AsyncClient::builder().default_headers(headers).build()?;
-
-        Ok(Tmdb { base_url, client })
+        // TODO: Should I set a User-Agent header?
+        Ok(Tmdb {
+            base_url,
+            auth_header,
+            agent: Agent::new(),
+        })
     }
 }
 
-/// An asynchronous client for sending requests to the TMDB API.
-///
-/// TODO: Add more info about its use.
-///
-/// # Example
-///
-/// TODO: Add multiple examples.
+/// A client for sending requests to the TMDB API.
 pub struct Tmdb {
     base_url: Url,
-    client: AsyncClient,
+    auth_header: Header,
+    agent: Agent,
 }
 
 impl Tmdb {
@@ -126,32 +119,31 @@ impl Tmdb {
     }
 }
 
-#[async_trait]
 impl Client for Tmdb {
-    async fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
     where
-        E: Endpoint + Sync,
+        E: Endpoint,
         D: DeserializeOwned,
     {
         let url = self.base_url.join(&endpoint.path())?;
-        // TODO: Do I need set a content-type header for the body?
-        let body = endpoint.body().unwrap_or_else(Vec::new);
 
-        let response = self
-            .client
-            .request(endpoint.method(), url)
-            .query(&endpoint.parameters())
-            .body(body)
-            .send()
-            .await?;
+        let mut request = self
+            .agent
+            .request_url(endpoint.method().name(), &url)
+            .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
-        let status = response.status();
-        let body = response.bytes().await?;
-
-        if !status.is_success() {
-            return Err(Error::from_tmdb(&body));
+        for (parameter, value) in endpoint.parameters() {
+            request = request.query(parameter, value);
         }
 
-        serde_json::from_slice::<D>(&body).map_err(Error::Json)
+        let response = if let Some(body) = endpoint.body() {
+            request.send_bytes(&body)
+        } else {
+            request.call()
+        };
+
+        // TODO: Improve error handling. We should handle different error codes
+        // and deserialize the TMDB response.
+        response?.into_json::<D>().map_err(Error::Io)
     }
 }
