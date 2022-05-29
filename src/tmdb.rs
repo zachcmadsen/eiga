@@ -29,6 +29,7 @@ impl<'a> TmdbBuilder<'a> {
     /// Sets the base URL for requests.
     pub fn base_url(&mut self, base_url: &'a str) -> &mut TmdbBuilder<'a> {
         self.base_url = Some(base_url);
+
         self
     }
 
@@ -39,7 +40,7 @@ impl<'a> TmdbBuilder<'a> {
         let auth_header =
             Header::new("authorization", &format!("Bearer {}", self.token));
 
-        // TODO: Should I set a User-Agent header?
+        // TODO: Should I set the User-Agent header?
         Ok(Tmdb {
             base_url,
             auth_header,
@@ -84,6 +85,7 @@ impl Tmdb {
         let mut request = self
             .agent
             .request_url(endpoint.method().name(), &url)
+            // TODO: Is it always safe to unwrap here?
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
         for (parameter, value) in endpoint.parameters() {

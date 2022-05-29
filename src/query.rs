@@ -1,12 +1,13 @@
 /// A helper type for collecting query string parameters.
 #[derive(Default)]
 pub struct QueryParameters<'a> {
+    // TODO: Use tinyvec to save on allocations?
     pairs: Vec<(&'a str, &'a str)>,
 }
 
 impl<'a> QueryParameters<'a> {
     /// Constructs a new, empty `QueryParameters`.
-    pub fn new() -> QueryParameters<'a> {
+    pub(crate) fn new() -> QueryParameters<'a> {
         QueryParameters { pairs: Vec::new() }
     }
 

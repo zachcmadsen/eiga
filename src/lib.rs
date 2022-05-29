@@ -8,4 +8,4 @@ pub mod tmdb;
 
 pub use client::Client;
 pub use error::Error;
-pub use tmdb::{Tmdb, TmdbBuilder};
+pub use tmdb::Tmdb;

@@ -25,11 +25,13 @@ impl<'a> TestClientBuilder<'a> {
 
     fn method(mut self, method: &'a str) -> TestClientBuilder {
         self.method = Some(method);
+
         self
     }
 
     fn path(mut self, path: &'a str) -> TestClientBuilder {
         self.path = Some(path);
+
         self
     }
 
@@ -38,6 +40,7 @@ impl<'a> TestClientBuilder<'a> {
         parameters: &'a [(&'a str, &'a str)],
     ) -> TestClientBuilder {
         self.parameters = Some(parameters);
+
         self
     }
 }
@@ -103,7 +106,7 @@ impl<'a> Client for TestClient<'a> {
 
 #[test]
 fn movie_details() {
-    let client = TestClient::builder()
+    let test_client = TestClient::builder()
         .method("GET")
         .path("movie/500")
         .parameters(&[("language", "en-US")])
@@ -112,5 +115,5 @@ fn movie_details() {
     let movie_details_endpoint =
         movie::Details::builder(500).language("en-US").build();
 
-    client.ignore(&movie_details_endpoint).unwrap();
+    test_client.ignore(&movie_details_endpoint).unwrap();
 }

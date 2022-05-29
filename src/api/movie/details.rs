@@ -23,9 +23,10 @@ impl<'a> DetailsBuilder<'a> {
         }
     }
 
-    /// Sets the `language` query string parameter.
+    /// Sets the language query string parameter.
     pub fn language(&mut self, language: &'a str) -> &mut DetailsBuilder<'a> {
         self.language = Some(language);
+
         self
     }
 }
@@ -55,6 +56,7 @@ impl<'a> Endpoint for Details<'a> {
     fn parameters(&self) -> QueryParameters {
         let mut parameters = QueryParameters::with_capacity(1);
         parameters.push("language", self.language);
+
         parameters
     }
 }
