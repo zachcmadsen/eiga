@@ -3,6 +3,7 @@ use serde::de::DeserializeOwned;
 
 use eiga::api::movie;
 use eiga::endpoint::Endpoint;
+use eiga::page::{Pageable, Paged};
 use eiga::Client;
 use eiga::Error;
 use eiga::Tmdb;
@@ -65,6 +66,14 @@ impl<'a> Client for TestClient<'a> {
     fn send<E, D>(&self, _: &E) -> Result<D, Error>
     where
         E: Endpoint,
+        D: DeserializeOwned,
+    {
+        unimplemented!()
+    }
+
+    fn page<'b, E, D>(&self, _: &'b E) -> Paged<'b, E, D>
+    where
+        E: Pageable,
         D: DeserializeOwned,
     {
         unimplemented!()
