@@ -1,30 +1,113 @@
 use httpmock::prelude::*;
+use serde::de::DeserializeOwned;
 
 use eiga::api::movie;
 use eiga::endpoint::Endpoint;
 use eiga::Client;
+use eiga::Error;
 use eiga::Tmdb;
 
-#[test]
-fn testing_works() {
-    let server = MockServer::start();
+/// A builder for `TestClient`.
+struct TestClientBuilder<'a> {
+    method: Option<&'a str>,
+    path: Option<&'a str>,
+    parameters: Option<&'a [(&'a str, &'a str)]>,
+}
 
-    let get_movie_details =
+impl<'a> TestClientBuilder<'a> {
+    fn build(self) -> TestClient<'a> {
+        TestClient {
+            method: self.method,
+            path: self.path,
+            parameters: self.parameters,
+        }
+    }
+
+    fn method(mut self, method: &'a str) -> TestClientBuilder {
+        self.method = Some(method);
+        self
+    }
+
+    fn path(mut self, path: &'a str) -> TestClientBuilder {
+        self.path = Some(path);
+        self
+    }
+
+    fn parameters(
+        mut self,
+        parameters: &'a [(&'a str, &'a str)],
+    ) -> TestClientBuilder {
+        self.parameters = Some(parameters);
+        self
+    }
+}
+
+struct TestClient<'a> {
+    method: Option<&'a str>,
+    path: Option<&'a str>,
+    parameters: Option<&'a [(&'a str, &'a str)]>,
+}
+
+impl<'a> TestClient<'a> {
+    fn builder() -> TestClientBuilder<'a> {
+        TestClientBuilder {
+            method: None,
+            path: None,
+            parameters: None,
+        }
+    }
+}
+
+impl<'a> Client for TestClient<'a> {
+    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    where
+        E: Endpoint,
+        D: DeserializeOwned,
+    {
+        let server = MockServer::start();
+
+        let mock = server.mock(|mut when, then| {
+            when = when.header("authorization", "Bearer <token>");
+            if let Some(method) = self.method {
+                when = when.method(method);
+            }
+            if let Some(path) = self.path {
+                when = when.path_contains(path);
+            }
+            if let Some(parameters) = self.parameters {
+                for (parameter, value) in parameters {
+                    when = when.query_param(*parameter, *value);
+                }
+            }
+
+            // Since we don't need to test JSON deserialization, we default to
+            // an empty body.
+            then.status(200).json_body(());
+        });
+
+        let tmdb = Tmdb::builder("<token>")
+            .base_url(&server.base_url())
+            .build()
+            .unwrap();
+
+        let response = tmdb.send(endpoint);
+
+        mock.assert();
+
+        response
+    }
+}
+
+#[test]
+fn movie_details() {
+    let client = TestClient::builder()
+        .method("GET")
+        .path("movie/500")
+        .parameters(&[("language", "en-US")])
+        .build();
+
+    let movie_details_endpoint =
         movie::Details::builder(500).language("en-US").build();
 
-    let movie_details_mock = server.mock(|when, then| {
-        when.method(get_movie_details.method().name())
-            .path_contains(get_movie_details.path())
-            .query_param("language", "en-US");
-        then.status(200).json_body(());
-    });
-
-    let tmdb = Tmdb::builder("token")
-        .base_url(&server.base_url())
-        .build()
-        .unwrap();
-
-    let _: () = tmdb.send(&get_movie_details).unwrap();
-
-    movie_details_mock.assert();
+    client.ignore(&movie_details_endpoint).unwrap();
 }
