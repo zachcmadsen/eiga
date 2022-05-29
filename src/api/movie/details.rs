@@ -15,6 +15,7 @@ impl<'a> DetailsBuilder<'a> {
         DetailsBuilder { id, language: None }
     }
 
+    /// Builds a new `Details` based on the current configuration.
     pub fn build(&self) -> Details<'a> {
         Details {
             id: self.id,
@@ -29,6 +30,7 @@ impl<'a> DetailsBuilder<'a> {
     }
 }
 
+/// The movie details endpoint.
 pub struct Details<'a> {
     id: u32,
     language: Option<&'a str>,

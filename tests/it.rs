@@ -59,10 +59,17 @@ impl<'a> TestClient<'a> {
 }
 
 impl<'a> Client for TestClient<'a> {
-    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    fn send<E, D>(&self, _: &E) -> Result<D, Error>
     where
         E: Endpoint,
         D: DeserializeOwned,
+    {
+        unimplemented!()
+    }
+
+    fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
+    where
+        E: Endpoint,
     {
         let server = MockServer::start();
 
@@ -80,21 +87,17 @@ impl<'a> Client for TestClient<'a> {
                 }
             }
 
-            // Since we don't need to test JSON deserialization, we default to
-            // an empty body.
-            then.status(200).json_body(());
+            then.status(200);
         });
 
         let tmdb = Tmdb::builder("<token>")
             .base_url(&server.base_url())
-            .build()
-            .unwrap();
-
-        let response = tmdb.send(endpoint);
+            .build()?;
+        tmdb.ignore(endpoint)?;
 
         mock.assert();
 
-        response
+        Ok(())
     }
 }
 

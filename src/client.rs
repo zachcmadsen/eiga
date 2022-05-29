@@ -12,8 +12,5 @@ pub trait Client {
 
     fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
     where
-        E: Endpoint,
-    {
-        self.send(endpoint)
-    }
+        E: Endpoint;
 }

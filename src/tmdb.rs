@@ -1,7 +1,5 @@
-use std::env;
-
 use serde::de::DeserializeOwned;
-use ureq::{Agent, Header};
+use ureq::{Agent, Header, Response};
 use url::Url;
 
 use crate::client::Client;
@@ -17,6 +15,7 @@ pub struct TmdbBuilder<'a> {
 }
 
 impl<'a> TmdbBuilder<'a> {
+    /// Constructs a new `TmdbBuilder` from the given token.
     fn new<S>(token: S) -> TmdbBuilder<'a>
     where
         S: Into<String>,
@@ -27,12 +26,7 @@ impl<'a> TmdbBuilder<'a> {
         }
     }
 
-    fn from_env() -> Result<TmdbBuilder<'a>, Error> {
-        let token = env::var("TMDB_TOKEN").unwrap();
-        Ok(TmdbBuilder::new(token))
-    }
-
-    /// Sets the base URL that's used for all requests.
+    /// Sets the base URL for requests.
     pub fn base_url(&mut self, base_url: &'a str) -> &mut TmdbBuilder<'a> {
         self.base_url = Some(base_url);
         self
@@ -64,31 +58,12 @@ pub struct Tmdb {
 impl Tmdb {
     /// Constructs a new `Tmdb` from the given token.
     ///
-    /// Use `Tmdb::builder` if you want to configure the base URL for
-    /// requests.
-    ///
-    /// # Errors
-    ///
-    /// This function returns an error if the token is invalid.
+    /// Use `Tmdb::builder` if you want to configure the base URL for requests.
     pub fn new<S>(token: S) -> Result<Tmdb, Error>
     where
         S: Into<String>,
     {
         TmdbBuilder::new(token).build()
-    }
-
-    /// Fetches a token from the `TMDB_TOKEN` environment variable and
-    /// constructs a new `Tmdb` with it.
-    ///
-    /// Use `Tmdb::builder` if you want to configure the base URL for
-    /// requests.
-    ///
-    /// # Errors
-    ///
-    /// This function returns an error if the environment variable isn't set
-    /// or if the token is invalid.
-    pub fn from_env() -> Result<Tmdb, Error> {
-        TmdbBuilder::from_env()?.build()
     }
 
     /// Constructs a new `TmdbBuilder` from the given token.
@@ -98,13 +73,11 @@ impl Tmdb {
     {
         TmdbBuilder::new(token)
     }
-}
 
-impl Client for Tmdb {
-    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    /// Calls the given endpoint and returns the response.
+    fn call<E>(&self, endpoint: &E) -> Result<Response, Error>
     where
         E: Endpoint,
-        D: DeserializeOwned,
     {
         let url = self.base_url.join(&endpoint.path())?;
 
@@ -125,6 +98,27 @@ impl Client for Tmdb {
 
         // TODO: Improve error handling. We should handle different error codes
         // and deserialize the TMDB response.
-        response?.into_json::<D>().map_err(Error::Io)
+        response.map_err(Error::Ureq)
+    }
+}
+
+impl Client for Tmdb {
+    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    where
+        E: Endpoint,
+        D: DeserializeOwned,
+    {
+        let response = self.call(endpoint)?;
+
+        response.into_json::<D>().map_err(Error::Io)
+    }
+
+    fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
+    where
+        E: Endpoint,
+    {
+        self.call(endpoint)?;
+
+        Ok(())
     }
 }

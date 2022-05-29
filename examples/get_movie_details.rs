@@ -1,16 +1,18 @@
 #![allow(dead_code)]
 
+use std::env;
+
 use eiga::api::movie;
 use eiga::Client;
 use eiga::Tmdb;
 use serde::Deserialize;
 
 // `eiga` doesn't provide models for TMDB responses. Instead, users create
-// their own structs with only the fields they want. The structs just need to
-// implement `Deserialize`. This struct is based off the response schema of
-// the get movie details endpoint:
+// their own structs with the fields they want. The structs just need to
+// implement `Deserialize`. This example is based on the response schema from
+// the TMDB API documentation:
 // https://developers.themoviedb.org/3/movies/get-movie-details.
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct MovieDetails {
     id: u64,
     original_language: String,
@@ -21,19 +23,21 @@ struct MovieDetails {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Build a TMDB client using the token in the TMDB_TOKEN environment
-    // variable.
-    let tmdb = Tmdb::from_env()?;
+    // Build a TMDB client by providing an API access token. In this example,
+    // the token is stored in the TMDB_TOKEN environment variable.
+    let token = env::var("TMDB_TOKEN").unwrap();
+    let tmdb = Tmdb::new(token)?;
 
-    // Build an endpoint to fetch details about Reservoir Dogs.
+    // Build an endpoint to fetch details about the movie Reservoir Dogs.
     let reservoir_dogs_id = 500;
     let get_movie_details = movie::Details::builder(reservoir_dogs_id)
         .language("en-US")
         .build();
 
+    // Send the request!
     let movie_details: MovieDetails = tmdb.send(&get_movie_details)?;
 
-    println!("{:#?}", movie_details);
+    assert_eq!(movie_details.title, "Reservoir Dogs");
 
     Ok(())
 }
