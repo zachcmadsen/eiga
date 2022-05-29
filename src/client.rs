@@ -11,7 +11,7 @@ pub trait Client {
         E: Endpoint,
         D: DeserializeOwned;
 
-    fn page<'a, E, D>(&self, endpoint: &'a E) -> Paged<'a, E, D>
+    fn page<'a, E, D>(&self, endpoint: &'a E) -> Paged<'a, D>
     where
         E: Pageable,
         D: DeserializeOwned;

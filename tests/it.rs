@@ -71,7 +71,7 @@ impl<'a> Client for TestClient<'a> {
         unimplemented!()
     }
 
-    fn page<'b, E, D>(&self, _: &'b E) -> Paged<'b, E, D>
+    fn page<'b, E, D>(&self, _: &'b E) -> Paged<'b, D>
     where
         E: Pageable,
         D: DeserializeOwned,

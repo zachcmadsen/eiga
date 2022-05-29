@@ -90,7 +90,7 @@ impl Tmdb {
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
         for (parameter, value) in endpoint.parameters() {
-            request = request.query(parameter, value);
+            request = request.query(parameter, &value);
         }
 
         let response = if let Some(body) = endpoint.body() {
@@ -116,7 +116,7 @@ impl Client for Tmdb {
         response.into_json::<D>().map_err(Error::Io)
     }
 
-    fn page<'a, E, D>(&self, endpoint: &'a E) -> Paged<'a, E, D>
+    fn page<'a, E, D>(&self, endpoint: &'a E) -> Paged<'a, D>
     where
         E: Pageable,
         D: DeserializeOwned,
