@@ -24,6 +24,16 @@ impl<'a> ToCow<'a> for u64 {
     }
 }
 
+impl<'a> ToCow<'a> for bool {
+    fn to_cow(&self) -> Cow<'a, str> {
+        if *self {
+            "true".into()
+        } else {
+            "false".into()
+        }
+    }
+}
+
 impl<'a> QueryParameters<'a> {
     /// Constructs a new, empty `QueryParameters`.
     pub(crate) fn new() -> QueryParameters<'a> {
