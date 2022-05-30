@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::marker::PhantomData;
 
 use serde::{de::DeserializeOwned, Deserialize};
 
@@ -8,85 +9,54 @@ use crate::{
 
 /// A trait for pageable endpoints.
 pub trait Pageable: Endpoint {
-    fn page(&self) -> u64 {
-        1
-    }
+    fn page(&self) -> Option<u64>;
 }
 
-/// A paged endpoint.
-pub struct Paged<'a, T> {
-    // endpoint: &'a E,
-    method: Method,
-    path: Cow<'static, str>,
-    parameters: QueryParameters<'a>,
-    page: u64,
-    phantom: std::marker::PhantomData<T>,
-}
-
-impl<'a, D> Paged<'a, D>
-where
-    D: DeserializeOwned,
-{
-    pub(crate) fn new<E>(endpoint: &E) -> Paged<D>
-    where
-        E: Pageable,
-    {
-        Paged {
-            method: endpoint.method(),
-            path: endpoint.path(),
-            parameters: endpoint.parameters(),
-            page: endpoint.page(),
-            phantom: std::marker::PhantomData,
-        }
-    }
-
-    pub fn iter<C>(&self, client: &'a C) -> PageIter<C, D>
-    where
-        C: Client,
-    {
-        PageIter {
-            client,
-            paged: self,
-            state: PageIterState {
-                next_page: Some(self.page),
-            },
-        }
-    }
-}
-
-/// The response for paged endpoints.
-#[derive(Deserialize)]
-struct Page<T> {
-    page: u64,
-    results: Vec<T>,
-    total_pages: u64,
-}
-
-struct PageIterState {
+struct PageIteratorState {
     next_page: Option<u64>,
 }
 
-pub struct PageIter<'a, C, T> {
+pub struct PageIterator<'a, C, E, T> {
     client: &'a C,
-    paged: &'a Paged<'a, T>,
-    state: PageIterState,
+    endpoint: &'a E,
+    state: PageIteratorState,
+    phantom: PhantomData<T>,
 }
 
-impl<'a, C, D> Endpoint for PageIter<'a, C, D>
+impl<'a, C, E, D> PageIterator<'a, C, E, D>
 where
     C: Client,
+    E: Pageable,
+    D: DeserializeOwned,
+{
+    pub fn new(client: &'a C, endpoint: &'a E) -> PageIterator<'a, C, E, D> {
+        PageIterator {
+            client,
+            endpoint,
+            state: PageIteratorState {
+                next_page: endpoint.page().or(Some(1)),
+            },
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<'a, C, E, D> Endpoint for PageIterator<'a, C, E, D>
+where
+    C: Client,
+    E: Pageable,
     D: DeserializeOwned,
 {
     fn method(&self) -> Method {
-        self.paged.method
+        self.endpoint.method()
     }
 
     fn path(&self) -> Cow<'static, str> {
-        self.paged.path.clone()
+        self.endpoint.path()
     }
 
     fn parameters(&self) -> QueryParameters {
-        let mut parameters = self.paged.parameters.clone();
+        let mut parameters = self.endpoint.parameters();
         if let Some(next_page) = self.state.next_page {
             parameters.replace("page", next_page)
         }
@@ -94,9 +64,10 @@ where
     }
 }
 
-impl<'a, C, D> Iterator for PageIter<'a, C, D>
+impl<'a, C, E, D> Iterator for PageIterator<'a, C, E, D>
 where
     C: Client,
+    E: Pageable,
     D: DeserializeOwned,
 {
     type Item = Result<Vec<D>, Error>;
@@ -106,10 +77,10 @@ where
             Some(page) => {
                 let response: Page<D> = self.client.send(self).unwrap();
 
-                if response.total_pages < *page {
+                if response.total_pages <= *page {
                     self.state.next_page = None
                 } else {
-                    self.state.next_page = Some(response.page);
+                    self.state.next_page = Some(page + 1);
                 }
 
                 Some(Ok(response.results))
@@ -117,4 +88,10 @@ where
             None => None,
         }
     }
+}
+
+#[derive(Deserialize)]
+struct Page<T> {
+    results: Vec<T>,
+    total_pages: u64,
 }
