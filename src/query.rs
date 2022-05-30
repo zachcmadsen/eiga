@@ -18,6 +18,12 @@ impl<'a> ToCow<'a> for &'a str {
     }
 }
 
+impl<'a> ToCow<'a> for u64 {
+    fn to_cow(&self) -> Cow<'a, str> {
+        format!("{}", self).into()
+    }
+}
+
 impl<'a> QueryParameters<'a> {
     /// Constructs a new, empty `QueryParameters`.
     pub(crate) fn new() -> QueryParameters<'a> {
