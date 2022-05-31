@@ -1,11 +1,14 @@
 use std::borrow::Cow;
 use std::marker::PhantomData;
 
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::de::DeserializeOwned;
+use serde::Deserialize;
 
-use crate::{
-    endpoint::Endpoint, http::Method, query::QueryParameters, Client, Error,
-};
+use crate::endpoint::Endpoint;
+use crate::http::Method;
+use crate::query::QueryParameters;
+use crate::Client;
+use crate::Error;
 
 /// A trait for pageable endpoints.
 pub trait Pageable: Endpoint {

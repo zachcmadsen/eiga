@@ -1,4 +1,3 @@
-use eiga::page::PageIterator;
 use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
@@ -7,7 +6,7 @@ use ureq::serde_json::{json, Value};
 use eiga::api::movie;
 use eiga::api::search;
 use eiga::endpoint::Endpoint;
-use eiga::page::Pageable;
+use eiga::page::{PageIterator, Pageable};
 use eiga::Client;
 use eiga::Error;
 use eiga::Tmdb;
