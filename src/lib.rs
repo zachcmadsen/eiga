@@ -4,6 +4,7 @@ pub mod endpoint;
 pub mod error;
 pub mod http;
 pub mod page;
+pub mod prelude;
 pub mod query;
 pub mod tmdb;
 
