@@ -5,8 +5,7 @@ use std::env;
 use serde::Deserialize;
 
 use eiga::api::movie;
-use eiga::Client;
-use eiga::Tmdb;
+use eiga::prelude::*;
 
 // `eiga` doesn't provide models for TMDB responses. Instead, users create
 // their own structs with the fields they want. The structs just need to
@@ -35,7 +34,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .language("en-US")
         .build();
 
-    // Send the request!
+    // Send the request! Type annotations are needed because `send` can
+    // deserialize the response body to any type that implements `Deserialize`.
     let movie_details: MovieDetails = tmdb.send(&get_movie_details)?;
 
     assert_eq!(movie_details.title, "Reservoir Dogs");
