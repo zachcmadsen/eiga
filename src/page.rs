@@ -12,7 +12,7 @@ use crate::query::QueryParameters;
 
 /// A trait for pageable endpoints.
 pub trait Page: Endpoint {
-    fn page(&self) -> Option<u64>;
+    fn page(&self) -> u64;
 }
 
 /// The TMDB response for paged endpoints.
@@ -45,7 +45,7 @@ where
             client,
             endpoint,
             state: PageIteratorState {
-                next_page: endpoint.page().or(Some(1)),
+                next_page: Some(endpoint.page()),
             },
             phantom: PhantomData,
         }
@@ -90,7 +90,7 @@ where
                 let response: PageResponse<D> =
                     self.client.send(self).unwrap();
 
-                self.state.next_page = if *page <= response.total_pages {
+                self.state.next_page = if *page < response.total_pages {
                     Some(page + 1)
                 } else {
                     None

@@ -132,7 +132,7 @@ impl<'a> Endpoint for Movies<'a> {
 }
 
 impl<'a> Page for Movies<'a> {
-    fn page(&self) -> Option<u64> {
-        self.page
+    fn page(&self) -> u64 {
+        self.page.unwrap_or(1)
     }
 }
