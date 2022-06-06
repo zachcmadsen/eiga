@@ -5,7 +5,7 @@ use url::Url;
 use crate::client::Client;
 use crate::endpoint::Endpoint;
 use crate::error::Error;
-use crate::page::{PageIterator, Pageable};
+use crate::page::{Page, PageIterator};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -121,7 +121,7 @@ impl Client for Tmdb {
         endpoint: &'a E,
     ) -> Box<dyn Iterator<Item = Result<Vec<D>, Error>> + 'a>
     where
-        E: Pageable,
+        E: Page,
         D: DeserializeOwned + 'a,
     {
         Box::new(PageIterator::new(self, endpoint))

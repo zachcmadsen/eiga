@@ -4,21 +4,29 @@ use std::marker::PhantomData;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
+use crate::client::Client;
 use crate::endpoint::Endpoint;
+use crate::error::Error;
 use crate::http::Method;
 use crate::query::QueryParameters;
-use crate::Client;
-use crate::Error;
 
 /// A trait for pageable endpoints.
-pub trait Pageable: Endpoint {
+pub trait Page: Endpoint {
     fn page(&self) -> Option<u64>;
+}
+
+/// The TMDB response for paged endpoints.
+#[derive(Deserialize)]
+struct PageResponse<T> {
+    results: Vec<T>,
+    total_pages: u64,
 }
 
 struct PageIteratorState {
     next_page: Option<u64>,
 }
 
+/// An iterator for paged endpoints.
 pub struct PageIterator<'a, C, E, T> {
     client: &'a C,
     endpoint: &'a E,
@@ -29,7 +37,7 @@ pub struct PageIterator<'a, C, E, T> {
 impl<'a, C, E, D> PageIterator<'a, C, E, D>
 where
     C: Client,
-    E: Pageable,
+    E: Page,
     D: DeserializeOwned,
 {
     pub fn new(client: &'a C, endpoint: &'a E) -> PageIterator<'a, C, E, D> {
@@ -47,7 +55,7 @@ where
 impl<'a, C, E, D> Endpoint for PageIterator<'a, C, E, D>
 where
     C: Client,
-    E: Pageable,
+    E: Page,
     D: DeserializeOwned,
 {
     fn method(&self) -> Method {
@@ -70,7 +78,7 @@ where
 impl<'a, C, E, D> Iterator for PageIterator<'a, C, E, D>
 where
     C: Client,
-    E: Pageable,
+    E: Page,
     D: DeserializeOwned,
 {
     type Item = Result<Vec<D>, Error>;
@@ -78,23 +86,19 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         match &self.state.next_page {
             Some(page) => {
-                let response: Page<D> = self.client.send(self).unwrap();
+                // TODO: Remove the unwrap here.
+                let response: PageResponse<D> =
+                    self.client.send(self).unwrap();
 
-                if response.total_pages <= *page {
-                    self.state.next_page = None
+                self.state.next_page = if *page <= response.total_pages {
+                    Some(page + 1)
                 } else {
-                    self.state.next_page = Some(page + 1);
-                }
+                    None
+                };
 
                 Some(Ok(response.results))
             }
             None => None,
         }
     }
-}
-
-#[derive(Deserialize)]
-struct Page<T> {
-    results: Vec<T>,
-    total_pages: u64,
 }

@@ -2,7 +2,7 @@ use serde::de::DeserializeOwned;
 
 use crate::endpoint::Endpoint;
 use crate::error::Error;
-use crate::page::Pageable;
+use crate::page::Page;
 
 /// A trait for objects that send requests.
 ///
@@ -46,7 +46,7 @@ pub trait Client {
         endpoint: &'a E,
     ) -> Box<dyn Iterator<Item = Result<Vec<D>, Error>> + 'a>
     where
-        E: Pageable,
+        E: Page,
         D: DeserializeOwned + 'a;
 
     fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>

@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use crate::endpoint::Endpoint;
 use crate::http::Method;
-use crate::page::Pageable;
+use crate::page::Page;
 use crate::query::QueryParameters;
 
 /// A builder for `Movies`.
@@ -131,7 +131,7 @@ impl<'a> Endpoint for Movies<'a> {
     }
 }
 
-impl<'a> Pageable for Movies<'a> {
+impl<'a> Page for Movies<'a> {
     fn page(&self) -> Option<u64> {
         self.page
     }

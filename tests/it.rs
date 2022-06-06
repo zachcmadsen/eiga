@@ -6,7 +6,7 @@ use ureq::serde_json::{json, Value};
 use eiga::api::movie;
 use eiga::api::search;
 use eiga::endpoint::Endpoint;
-use eiga::page::{PageIterator, Pageable};
+use eiga::page::{Page, PageIterator};
 use eiga::Client;
 use eiga::Error;
 use eiga::Tmdb;
@@ -129,7 +129,7 @@ impl<'a> Client for TestClient<'a> {
         endpoint: &'b E,
     ) -> Box<dyn Iterator<Item = Result<Vec<D>, Error>> + 'b>
     where
-        E: Pageable,
+        E: Page,
         D: DeserializeOwned + 'b,
     {
         Box::new(PageIterator::new(self, endpoint))
