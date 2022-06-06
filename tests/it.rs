@@ -5,11 +5,8 @@ use ureq::serde_json::{json, Value};
 
 use eiga::api::movie;
 use eiga::api::search;
-use eiga::endpoint::Endpoint;
 use eiga::page::{Page, PageIterator};
-use eiga::Client;
-use eiga::Error;
-use eiga::Tmdb;
+use eiga::prelude::*;
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {
@@ -109,7 +106,7 @@ impl<'a> TestClient<'a> {
 }
 
 impl<'a> Client for TestClient<'a> {
-    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
+    fn send<E, D>(&self, endpoint: &E) -> Result<D, eiga::Error>
     where
         E: Endpoint,
         D: DeserializeOwned,
@@ -127,7 +124,7 @@ impl<'a> Client for TestClient<'a> {
     fn page<'b, E, D>(
         &'b self,
         endpoint: &'b E,
-    ) -> Box<dyn Iterator<Item = Result<Vec<D>, Error>> + 'b>
+    ) -> Box<dyn Iterator<Item = Result<Vec<D>, eiga::Error>> + 'b>
     where
         E: Page,
         D: DeserializeOwned + 'b,
@@ -135,7 +132,7 @@ impl<'a> Client for TestClient<'a> {
         Box::new(PageIterator::new(self, endpoint))
     }
 
-    fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
+    fn ignore<E>(&self, endpoint: &E) -> Result<(), eiga::Error>
     where
         E: Endpoint,
     {

@@ -10,4 +10,5 @@ pub mod tmdb;
 
 pub use client::Client;
 pub use error::Error;
+pub use query::QueryParameters;
 pub use tmdb::Tmdb;
