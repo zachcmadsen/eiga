@@ -1,12 +1,5 @@
 use std::borrow::Cow;
 
-/// A helper type for collecting query string parameters.
-#[derive(Clone)]
-pub struct QueryParameters<'a> {
-    // TODO: Use tinyvec to save on allocations?
-    parameters: Vec<(&'a str, Cow<'a, str>)>,
-}
-
 /// A trait for converting a value to a `Cow`.
 pub trait ToCow<'a> {
     fn to_cow(&self) -> Cow<'a, str>;
@@ -34,22 +27,72 @@ impl<'a> ToCow<'a> for bool {
     }
 }
 
+/// A helper type for collecting query string parameters.
+///
+/// # Example
+///
+/// ```
+/// use eiga::QueryParameters;
+///
+/// let mut parameters = QueryParameters::new();
+/// parameters.push("language", Some("en-US"));
+/// parameters.push("include_adult", Some(false));
+/// parameters.replace("include_adult", true);
+///
+/// assert_eq!(parameters.into_iter().count(), 2);
+/// ```
+#[derive(Clone)]
+pub struct QueryParameters<'a> {
+    // TODO: Use tinyvec to save on allocations?
+    parameters: Vec<(&'a str, Cow<'a, str>)>,
+}
+
 impl<'a> QueryParameters<'a> {
     /// Constructs a new, empty `QueryParameters`.
-    pub(crate) fn new() -> QueryParameters<'a> {
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eiga::QueryParameters;
+    ///
+    /// let mut parameters = QueryParameters::new();
+    /// ```
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> QueryParameters<'a> {
         QueryParameters {
             parameters: Vec::new(),
         }
     }
 
     /// Constructs a new, empty `QueryParameters` with the given capacity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eiga::QueryParameters;
+    ///
+    /// let mut parameters = QueryParameters::with_capacity(4);
+    /// ```
     pub fn with_capacity(capacity: usize) -> QueryParameters<'a> {
         QueryParameters {
             parameters: Vec::with_capacity(capacity),
         }
     }
 
-    /// Appends a new query string parameter to the collection.
+    /// Appends a new parameter to the collection.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eiga::QueryParameters;
+    ///
+    /// let mut parameters = QueryParameters::new();
+    /// parameters.push("language", Some("en-US"));
+    /// parameters.push("include_adult", Some(false));
+    /// parameters.push("year", Some(1998));
+    ///
+    /// assert_eq!(parameters.into_iter().count(), 3);
+    /// ```
     pub fn push<C>(&mut self, parameter: &'a str, value: Option<C>)
     where
         C: ToCow<'a>,
@@ -59,6 +102,21 @@ impl<'a> QueryParameters<'a> {
         }
     }
 
+    /// Replaces the value of an existing parameter. If the parameter doesn't
+    /// exist, then it's added to the collection.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eiga::QueryParameters;
+    ///
+    /// let mut parameters = QueryParameters::new();
+    /// parameters.push("page", Some(1));
+    /// parameters.replace("page", 2);
+    /// parameters.replace("language", "en-US");
+    ///
+    /// assert_eq!(parameters.into_iter().count(), 2);
+    /// ```
     pub fn replace<C>(&mut self, parameter: &'a str, value: C)
     where
         C: ToCow<'a>,
