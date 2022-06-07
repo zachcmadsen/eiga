@@ -5,6 +5,7 @@ use url::Url;
 use crate::client::Client;
 use crate::endpoint::Endpoint;
 use crate::error::Error;
+use crate::page::{Page, PageIterator};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -60,11 +61,13 @@ impl Tmdb {
     /// Constructs a new `Tmdb` from the given token.
     ///
     /// Use `Tmdb::builder` if you want to configure the base URL for requests.
-    pub fn new<S>(token: S) -> Result<Tmdb, Error>
+    pub fn new<S>(token: S) -> Tmdb
     where
         S: Into<String>,
     {
-        TmdbBuilder::new(token).build()
+        // TmdbBuilder only fails if the base URL is invalid. The default URL
+        // is valid so it's safe to unwrap here.
+        TmdbBuilder::new(token).build().unwrap()
     }
 
     /// Constructs a new `TmdbBuilder` from the given token.
@@ -89,7 +92,7 @@ impl Tmdb {
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
         for (parameter, value) in endpoint.parameters() {
-            request = request.query(parameter, value);
+            request = request.query(parameter, &value);
         }
 
         let response = if let Some(body) = endpoint.body() {
@@ -113,6 +116,17 @@ impl Client for Tmdb {
         let response = self.call(endpoint)?;
 
         response.into_json::<D>().map_err(Error::Io)
+    }
+
+    fn page<'a, E, D>(
+        &'a self,
+        endpoint: &'a E,
+    ) -> Box<dyn Iterator<Item = Result<Vec<D>, Error>> + 'a>
+    where
+        E: Page,
+        D: DeserializeOwned + 'a,
+    {
+        Box::new(PageIterator::new(self, endpoint))
     }
 
     fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
