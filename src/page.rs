@@ -84,21 +84,18 @@ where
     type Item = Result<Vec<D>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.state.next_page {
-            Some(page) => {
-                Some(self.client.send::<_, PageResponse<D>>(self).map(
-                    |response| {
-                        self.state.next_page = if page < response.total_pages {
-                            Some(page + 1)
-                        } else {
-                            None
-                        };
+        self.state.next_page.map(|page| {
+            self.client
+                .send::<_, PageResponse<D>>(self)
+                .map(|response| {
+                    self.state.next_page = if page < response.total_pages {
+                        Some(page + 1)
+                    } else {
+                        None
+                    };
 
-                        response.results
-                    },
-                ))
-            }
-            None => None,
-        }
+                    response.results
+                })
+        })
     }
 }
