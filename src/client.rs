@@ -23,7 +23,7 @@ use crate::page::Page;
 ///
 /// fn main() -> Result<(), eiga::Error> {
 ///     // Create a `Tmdb` client.
-///     let tmdb = Tmdb::new("<token>")?;
+///     let tmdb = Tmdb::new("<token>");
 ///     
 ///     // Build an endpoint to search for the movie Pale Flower.
 ///     let search_movies_endpoint =

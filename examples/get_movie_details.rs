@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build a TMDB client by providing an API access token. In this example,
     // the token is stored in the TMDB_TOKEN environment variable.
     let token = env::var("TMDB_TOKEN")?;
-    let tmdb = Tmdb::new(token)?;
+    let tmdb = Tmdb::new(token);
 
     // Build an endpoint to fetch details about the movie Reservoir Dogs.
     let reservoir_dogs_id = 500;

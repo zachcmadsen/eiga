@@ -61,11 +61,13 @@ impl Tmdb {
     /// Constructs a new `Tmdb` from the given token.
     ///
     /// Use `Tmdb::builder` if you want to configure the base URL for requests.
-    pub fn new<S>(token: S) -> Result<Tmdb, Error>
+    pub fn new<S>(token: S) -> Tmdb
     where
         S: Into<String>,
     {
-        TmdbBuilder::new(token).build()
+        // TmdbBuilder only fails if the base URL is invalid. The default URL
+        // is valid so it's safe to unwrap here.
+        TmdbBuilder::new(token).build().unwrap()
     }
 
     /// Constructs a new `TmdbBuilder` from the given token.
