@@ -84,19 +84,19 @@ where
     type Item = Result<Vec<D>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match &self.state.next_page {
+        match self.state.next_page {
             Some(page) => {
-                // TODO: Remove the unwrap here.
-                let response: PageResponse<D> =
-                    self.client.send(self).unwrap();
+                Some(self.client.send::<_, PageResponse<D>>(self).map(
+                    |response| {
+                        self.state.next_page = if page < response.total_pages {
+                            Some(page + 1)
+                        } else {
+                            None
+                        };
 
-                self.state.next_page = if *page < response.total_pages {
-                    Some(page + 1)
-                } else {
-                    None
-                };
-
-                Some(Ok(response.results))
+                        response.results
+                    },
+                ))
             }
             None => None,
         }
