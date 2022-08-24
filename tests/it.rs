@@ -1,11 +1,9 @@
 use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
-use ureq::serde_json::{json, Value};
 
 use eiga::api::movie;
 use eiga::api::search;
-use eiga::page::{Page, PageIterator};
 use eiga::prelude::*;
 
 /// A builder for `TestClient`.
@@ -13,7 +11,6 @@ struct TestClientBuilder<'a> {
     method: Option<&'a str>,
     path: Option<&'a str>,
     parameters: Option<&'a [(&'a str, &'a str)]>,
-    body: Option<Value>,
 }
 
 impl<'a> TestClientBuilder<'a> {
@@ -30,7 +27,6 @@ impl<'a> TestClientBuilder<'a> {
             method: self.method,
             path: self.path,
             parameters: self.parameters,
-            body: self.body,
         }
     }
 
@@ -54,12 +50,6 @@ impl<'a> TestClientBuilder<'a> {
 
         self
     }
-
-    fn body(mut self, body: Value) -> TestClientBuilder<'a> {
-        self.body = Some(body);
-
-        self
-    }
 }
 
 struct TestClient<'a> {
@@ -68,7 +58,6 @@ struct TestClient<'a> {
     method: Option<&'a str>,
     path: Option<&'a str>,
     parameters: Option<&'a [(&'a str, &'a str)]>,
-    body: Option<Value>,
 }
 
 impl<'a> TestClient<'a> {
@@ -77,13 +66,11 @@ impl<'a> TestClient<'a> {
             method: None,
             path: None,
             parameters: None,
-            body: None,
         }
     }
 
-    #[allow(unused_assignments)]
     fn mock(&self) -> Mock {
-        self.server.mock(|mut when, mut then| {
+        self.server.mock(|mut when, then| {
             when = when.header("authorization", "Bearer <token>");
             if let Some(method) = self.method {
                 when = when.method(method);
@@ -97,10 +84,7 @@ impl<'a> TestClient<'a> {
                 }
             }
 
-            then = then.status(200);
-            if let Some(body) = self.body.clone() {
-                then = then.json_body(body);
-            }
+            then.status(200);
         })
     }
 }
@@ -119,17 +103,6 @@ impl<'a> Client for TestClient<'a> {
         mock.delete();
 
         result
-    }
-
-    fn page<'b, E, D>(
-        &'b self,
-        endpoint: &'b E,
-    ) -> Box<dyn Iterator<Item = Result<Vec<D>, eiga::Error>> + 'b>
-    where
-        E: Page,
-        D: DeserializeOwned + 'b,
-    {
-        Box::new(PageIterator::new(self, endpoint))
     }
 
     fn ignore<E>(&self, endpoint: &E) -> Result<(), eiga::Error>
@@ -163,8 +136,6 @@ fn movie_details() {
 
 #[test]
 fn search_movies() {
-    let total_pages = 5;
-
     let test_client = TestClient::builder()
         .method("GET")
         .path("search/movie")
@@ -175,7 +146,6 @@ fn search_movies() {
             ("year", "1965"),
             ("primary_release_year", "1965"),
         ])
-        .body(json!({"results": [], "total_pages": total_pages}))
         .build();
 
     let search_movies_endpoint = search::Movies::builder("Samurai Spy")
@@ -188,8 +158,4 @@ fn search_movies() {
         .build();
 
     test_client.ignore(&search_movies_endpoint).unwrap();
-
-    let page_iter = test_client.page::<_, ()>(&search_movies_endpoint);
-
-    assert_eq!(page_iter.count(), total_pages);
 }

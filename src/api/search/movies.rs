@@ -2,7 +2,6 @@ use std::borrow::Cow;
 
 use crate::endpoint::Endpoint;
 use crate::http::Method;
-use crate::page::Page;
 use crate::query::QueryParameters;
 
 /// A builder for `Movies`.
@@ -128,11 +127,5 @@ impl<'a> Endpoint for Movies<'a> {
         parameters.push("year", self.year);
         parameters.push("primary_release_year", self.primary_release_year);
         parameters
-    }
-}
-
-impl<'a> Page for Movies<'a> {
-    fn page(&self) -> u64 {
-        self.page.unwrap_or(1)
     }
 }
