@@ -5,13 +5,12 @@ use std::io;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error(
-        "an error occurred while deserializing the response body {}",
-        self
-    )]
-    Io(#[from] io::Error),
-    #[error("an error occurred while processing the request {}", self)]
-    Ureq(#[from] ureq::Error),
-    #[error("invalid URL {}", self)]
-    Url(#[from] url::ParseError),
+    #[error("failed to deserialize the TMDB response: {}", self)]
+    Deserialize(#[from] io::Error),
+    #[error("failed to parse a URL: {}", self)]
+    InvalidUrl(#[from] url::ParseError),
+    #[error("TMDB responded with an unexpected status: {}", .message)]
+    Tmdb { code: u16, message: String },
+    #[error("failed to make the request or receive an response: {}", self)]
+    Transport(#[from] ureq::Transport),
 }

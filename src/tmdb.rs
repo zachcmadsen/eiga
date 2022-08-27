@@ -1,5 +1,10 @@
 use serde::de::DeserializeOwned;
-use ureq::{Agent, Header, Response};
+use serde::Deserialize;
+use ureq::{
+    Agent,
+    Error::{Status, Transport},
+    Header, Response,
+};
 use url::Url;
 
 use crate::client::Client;
@@ -7,6 +12,12 @@ use crate::endpoint::Endpoint;
 use crate::error::Error;
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
+
+/// The TMDB error response body.
+#[derive(Deserialize)]
+struct TmdbError {
+    status_message: String,
+}
 
 /// A builder for `Tmdb`.
 pub struct TmdbBuilder<'a> {
@@ -100,9 +111,18 @@ impl Tmdb {
             request.call()
         };
 
-        // TODO: Improve error handling. We should handle different error codes
-        // and deserialize the TMDB response.
-        response.map_err(Error::Ureq)
+        match response {
+            Ok(response) => Ok(response),
+            Err(Status(code, response)) => {
+                let error = response.into_json::<TmdbError>()?;
+
+                Err(Error::Tmdb {
+                    code,
+                    message: error.status_message,
+                })
+            }
+            Err(Transport(transport)) => Err(Error::Transport(transport)),
+        }
     }
 }
 
@@ -114,7 +134,7 @@ impl Client for Tmdb {
     {
         let response = self.call(endpoint)?;
 
-        response.into_json::<D>().map_err(Error::Io)
+        response.into_json::<D>().map_err(Error::Deserialize)
     }
 
     fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
