@@ -1,4 +1,5 @@
 # eiga
 
-`eiga` is a third party TMDB API client. It's mostly incomplete, and can't be
-used for anything yet.
+[![CI](https://github.com/zachcmadsen/eiga/workflows/CI/badge.svg?branch=main)](https://github.com/zachcmadsen/eiga/actions?query=branch%3Amain)
+
+`eiga` is a WIP TMDB API client.
