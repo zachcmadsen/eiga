@@ -131,7 +131,13 @@ fn movie_details() {
     let movie_details_endpoint =
         movie::Details::builder(500).language("en-US").build();
 
-    test_client.ignore(&movie_details_endpoint).unwrap();
+    let result = test_client.ignore(&movie_details_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
 
 #[test]
@@ -145,9 +151,13 @@ fn movie_alternative_titles() {
     let movie_alternative_titles_endpoint =
         movie::AlternativeTitles::builder(500).country("US").build();
 
-    test_client
-        .ignore(&movie_alternative_titles_endpoint)
-        .unwrap();
+    let result = test_client.ignore(&movie_alternative_titles_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
 
 #[test]
@@ -161,7 +171,13 @@ fn movie_credits() {
     let movie_credits_endpoint =
         movie::Credits::builder(500).language("en-US").build();
 
-    test_client.ignore(&movie_credits_endpoint).unwrap();
+    let result = test_client.ignore(&movie_credits_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
 
 #[test]
@@ -187,5 +203,11 @@ fn search_movies() {
         .primary_release_year(1965)
         .build();
 
-    test_client.ignore(&search_movies_endpoint).unwrap();
+    let result = test_client.ignore(&search_movies_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
