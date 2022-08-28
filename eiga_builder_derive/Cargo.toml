@@ -2,6 +2,10 @@
 name = "eiga_builder_derive"
 version = "0.1.0"
 edition = "2021"
+authors = ["Zach Madsen <zachcmadsen@gmail.com>"]
+license = "MIT"
+description = "A builder derive macro for the `eiga` crate"
+repository = "https://github.com/zachcmadsen/eiga"
 
 [lib]
 proc-macro = true
