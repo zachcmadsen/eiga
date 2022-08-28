@@ -1,7 +1,14 @@
 [package]
 name = "eiga"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
+authors = ["Zach Madsen <zachcmadsen@gmail.com>"]
+license = "MIT"
+description = "A WIP TMDB API client"
+documentation = "https://docs.rs/eiga"
+repository = "https://github.com/zachcmadsen/eiga"
+readme = "README.md"
+keywords = ["TMDB"]
 
 [dependencies]
 eiga_builder_derive = { path = "eiga_builder_derive" }
