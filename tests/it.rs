@@ -14,7 +14,7 @@ struct TestClientBuilder<'a> {
 }
 
 impl<'a> TestClientBuilder<'a> {
-    fn build(self) -> TestClient<'a> {
+    fn build(&self) -> TestClient<'a> {
         let server = MockServer::start();
         let tmdb = Tmdb::builder("<token>")
             .base_url(&server.base_url())
@@ -30,22 +30,22 @@ impl<'a> TestClientBuilder<'a> {
         }
     }
 
-    fn method(mut self, method: &'a str) -> TestClientBuilder {
+    fn method(&mut self, method: &'a str) -> &mut TestClientBuilder<'a> {
         self.method = Some(method);
 
         self
     }
 
-    fn path(mut self, path: &'a str) -> TestClientBuilder {
+    fn path(&mut self, path: &'a str) -> &mut TestClientBuilder<'a> {
         self.path = Some(path);
 
         self
     }
 
     fn parameters(
-        mut self,
+        &mut self,
         parameters: &'a [(&'a str, &'a str)],
-    ) -> TestClientBuilder {
+    ) -> &mut TestClientBuilder<'a> {
         self.parameters = Some(parameters);
 
         self
@@ -131,7 +131,53 @@ fn movie_details() {
     let movie_details_endpoint =
         movie::Details::builder(500).language("en-US").build();
 
-    test_client.ignore(&movie_details_endpoint).unwrap();
+    let result = test_client.ignore(&movie_details_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
+}
+
+#[test]
+fn movie_alternative_titles() {
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("movie/500/alternative_titles")
+        .parameters(&[("country", "US")])
+        .build();
+
+    let movie_alternative_titles_endpoint =
+        movie::AlternativeTitles::builder(500).country("US").build();
+
+    let result = test_client.ignore(&movie_alternative_titles_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
+}
+
+#[test]
+fn movie_credits() {
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("movie/500/credits")
+        .parameters(&[("language", "en-US")])
+        .build();
+
+    let movie_credits_endpoint =
+        movie::Credits::builder(500).language("en-US").build();
+
+    let result = test_client.ignore(&movie_credits_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
 
 #[test]
@@ -157,5 +203,11 @@ fn search_movies() {
         .primary_release_year(1965)
         .build();
 
-    test_client.ignore(&search_movies_endpoint).unwrap();
+    let result = test_client.ignore(&search_movies_endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
 }
