@@ -1,7 +1,6 @@
 use serde::de::DeserializeOwned;
 
-use crate::endpoint::Endpoint;
-use crate::error::Error;
+use crate::{Endpoint, Error};
 
 /// A trait for objects that send requests.
 ///
@@ -15,8 +14,7 @@ use crate::error::Error;
 /// # Example
 ///
 /// ```no_run
-/// use eiga::api::search;
-/// use eiga::prelude::*;
+/// use eiga::{search, Client, Tmdb};
 ///
 /// fn main() -> Result<(), eiga::Error> {
 ///     // Create a `Tmdb` client.

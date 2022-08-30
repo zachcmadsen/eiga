@@ -12,6 +12,7 @@ keywords = ["TMDB"]
 
 [dependencies]
 eiga_builder_derive = { version = "0.1.0", path = "eiga_builder_derive" }
+http = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "1.0"
 ureq = { version = "2.4.0", features = ["json"] }

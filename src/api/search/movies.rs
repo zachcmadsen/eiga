@@ -1,10 +1,9 @@
 use std::borrow::Cow;
 
 use eiga_builder_derive::Builder;
+use http::Method;
 
-use crate::endpoint::Endpoint;
-use crate::http::Method;
-use crate::query::QueryParameters;
+use crate::{Endpoint, QueryParameters};
 
 /// The search movies endpoint.
 #[derive(Builder)]
@@ -20,7 +19,7 @@ pub struct Movies<'a> {
 
 impl<'a> Endpoint for Movies<'a> {
     fn method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn path(&self) -> Cow<'static, str> {

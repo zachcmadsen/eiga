@@ -1,7 +1,8 @@
 use std::borrow::Cow;
 
-use crate::http::Method;
-use crate::query::QueryParameters;
+use http::Method;
+
+use crate::QueryParameters;
 
 /// A trait for endpoint objects.
 pub trait Endpoint {
