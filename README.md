@@ -13,6 +13,6 @@
 [crate_badge]: https://img.shields.io/crates/v/eiga.svg
 [crate]: https://crates.io/crates/eiga
 [docs_badge]: https://img.shields.io/docsrs/eiga/latest.svg
-[docs]: https://docs.rs/crates/eiga
+[docs]: https://docs.rs/eiga
 [license_badge]: https://img.shields.io/crates/l/eiga.svg
 [license]: https://github.com/zachcmadsen/eiga/blob/main/LICENSE
