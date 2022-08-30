@@ -14,7 +14,7 @@ use crate::{Endpoint, Error};
 /// # Example
 ///
 /// ```no_run
-/// use eiga::{api::search, Client, Tmdb};
+/// use eiga::{search, Client, Tmdb};
 ///
 /// fn main() -> Result<(), eiga::Error> {
 ///     // Create a `Tmdb` client.
