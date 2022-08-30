@@ -3,8 +3,7 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::endpoint::Endpoint;
-use crate::QueryParameters;
+use crate::{Endpoint, QueryParameters};
 
 /// The search movies endpoint.
 #[derive(Builder)]

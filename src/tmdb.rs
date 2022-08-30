@@ -7,9 +7,7 @@ use ureq::{
 };
 use url::Url;
 
-use crate::client::Client;
-use crate::endpoint::Endpoint;
-use crate::error::Error;
+use crate::{Client, Endpoint, Error};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
