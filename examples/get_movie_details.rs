@@ -4,8 +4,7 @@ use std::env;
 
 use serde::Deserialize;
 
-use eiga::api::movie;
-use eiga::prelude::*;
+use eiga::{movie, Client, Tmdb};
 
 // `eiga` doesn't provide models for TMDB responses. Instead, users create
 // their own structs with the fields they want. The structs just need to

@@ -2,9 +2,7 @@ use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
 
-use eiga::api::movie;
-use eiga::api::search;
-use eiga::prelude::*;
+use eiga::{movie, search, Client, Endpoint, Tmdb};
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {

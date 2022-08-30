@@ -97,7 +97,7 @@ impl Tmdb {
 
         let mut request = self
             .agent
-            .request_url(endpoint.method().name(), &url)
+            .request_url(endpoint.method().as_str(), &url)
             // TODO: Is it always safe to unwrap here?
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
