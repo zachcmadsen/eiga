@@ -1,3 +1,3 @@
 mod movies;
 
-pub use movies::Movies;
+pub use movies::*;
