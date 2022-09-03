@@ -1,43 +1,36 @@
-#![allow(dead_code)]
-
 use std::env;
+use std::error::Error;
 
 use serde::Deserialize;
 
 use eiga::{movie, Client, Tmdb};
 
-// `eiga` doesn't provide models for TMDB responses. Instead, users create
-// their own structs with the fields they want. The structs just need to
-// implement `Deserialize`. This example is based on the response schema from
-// the TMDB API documentation:
-// https://developers.themoviedb.org/3/movies/get-movie-details.
+// eiga doesn't provide types for endpoint responses. Instead, users provider
+// their own structs to deserialize into.
 #[derive(Deserialize)]
 struct MovieDetails {
-    id: u64,
-    original_language: String,
-    overview: String,
     release_date: String,
-    tagline: Option<String>,
     title: String,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Build a TMDB client by providing an API access token. In this example,
-    // the token is stored in the TMDB_TOKEN environment variable.
+fn main() -> Result<(), Box<dyn Error>> {
+    // Create a TMDB client by providing an API access token. Here, the token
+    // is stored in the TMDB_TOKEN environment variable.
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    // Build an endpoint to fetch details about the movie Reservoir Dogs.
-    let reservoir_dogs_id = 500;
-    let get_movie_details = movie::Details::builder(reservoir_dogs_id)
+    // Build an endpoint to fetch details about "Tokyo Drifter" (1966).
+    let tokyo_drifter_id = 45706;
+    let movie_details_endpoint = movie::Details::builder(tokyo_drifter_id)
         .language("en-US")
         .build();
 
-    // Send the request! Type annotations are needed because `send` can
-    // deserialize the response body to any type that implements `Deserialize`.
-    let movie_details: MovieDetails = tmdb.send(&get_movie_details)?;
+    // Send the request! Type annotations are required because `send` can
+    // deserialize the response to any type that implements `Deserialize`.
+    let movie_details: MovieDetails = tmdb.send(&movie_details_endpoint)?;
 
-    assert_eq!(movie_details.title, "Reservoir Dogs");
+    assert_eq!(movie_details.title, "Tokyo Drifter");
+    assert_eq!(movie_details.release_date, "1966-04-10");
 
     Ok(())
 }
