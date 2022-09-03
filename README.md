@@ -26,7 +26,7 @@ use eiga::{Client, Tmdb};
 ## Example
 
 This example shows how to fetch details about a movie. You can find other
-examples in the `examples` folder.
+examples in the [`examples`][examples] folder.
 
 ```rs
 use std::env;
@@ -84,5 +84,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 [license]: https://github.com/zachcmadsen/eiga/blob/main/LICENSE
 
 <!-- Links -->
+[examples]: https://github.com/zachcmadsen/eiga/tree/main/examples
 [gitlab_crate]: https://crates.io/crates/gitlab
 [gitlab_design]: https://plume.benboeckel.net/~/JustAnotherBlog/designing-rust-bindings-for-rest-ap-is
