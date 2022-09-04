@@ -23,8 +23,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let page: Page<MovieResult> = tmdb.send(&search_movies_endpoint)?;
 
     assert!(page.is_last_page());
-    // Iterate over the results to see if they contain 1962 version of "Black
-    // Lizard."
+    // Iterate over the results to see if they contain the 1962 version of
+    // "Black Lizard."
     assert!(page.results.iter().any(|result| {
         result.title == "Black Lizard" && result.release_date == "1962-03-14"
     }));
