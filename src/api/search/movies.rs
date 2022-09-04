@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, QueryParameters};
+use crate::{Endpoint, Pageable, QueryParameters};
 
 /// The search movies endpoint.
 #[derive(Builder)]
@@ -38,3 +38,5 @@ impl<'a> Endpoint for Movies<'a> {
         parameters
     }
 }
+
+impl<'a> Pageable for Movies<'a> {}

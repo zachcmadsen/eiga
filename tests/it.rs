@@ -2,7 +2,7 @@ use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
 
-use eiga::{movie, search, Client, Endpoint, Tmdb};
+use eiga::{movie, search, Client, Endpoint, PageIter, Pageable, Tmdb};
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {
@@ -115,6 +115,14 @@ impl<'a> Client for TestClient<'a> {
         mock.delete();
 
         Ok(())
+    }
+
+    fn page<'b, E, D>(&'b self, endpoint: &'b E) -> PageIter<'b, Self, E, D>
+    where
+        E: Pageable,
+        D: DeserializeOwned,
+    {
+        todo!()
     }
 }
 

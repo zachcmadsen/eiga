@@ -7,7 +7,7 @@ use ureq::{
 };
 use url::Url;
 
-use crate::{Client, Endpoint, Error};
+use crate::{Client, Endpoint, Error, PageIter, Pageable};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -142,5 +142,13 @@ impl Client for Tmdb {
         self.call(endpoint)?;
 
         Ok(())
+    }
+
+    fn page<'a, E, D>(&'a self, endpoint: &'a E) -> PageIter<'a, Self, E, D>
+    where
+        E: Pageable,
+        D: DeserializeOwned,
+    {
+        PageIter::new(self, endpoint)
     }
 }
