@@ -39,4 +39,8 @@ impl<'a> Endpoint for Movies<'a> {
     }
 }
 
-impl<'a> Pageable for Movies<'a> {}
+impl<'a> Pageable for Movies<'a> {
+    fn page(&self) -> Option<u64> {
+        self.page
+    }
+}
