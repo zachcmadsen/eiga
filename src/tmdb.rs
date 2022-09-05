@@ -17,6 +17,11 @@ struct TmdbError {
     status_message: String,
 }
 
+#[derive(Deserialize)]
+struct UnprocessableEntityError {
+    errors: Vec<String>,
+}
+
 /// A builder for `Tmdb`.
 pub struct TmdbBuilder<'a> {
     token: String,
@@ -111,8 +116,16 @@ impl Tmdb {
 
         match response {
             Ok(response) => Ok(response),
+            Err(Status(422, response)) => {
+                let error: UnprocessableEntityError = response.into_json()?;
+
+                Err(Error::Tmdb {
+                    code: 422,
+                    message: error.errors.join(", "),
+                })
+            }
             Err(Status(code, response)) => {
-                let error = response.into_json::<TmdbError>()?;
+                let error: TmdbError = response.into_json()?;
 
                 Err(Error::Tmdb {
                     code,
