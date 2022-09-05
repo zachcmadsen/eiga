@@ -15,12 +15,17 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    let search_movies_endpoint =
-        search::Movies::builder("Black Lizard").build();
+    let search_movies_endpoint = search::Movies::builder("Ringu").build();
 
+    // `page` returns an iterator over the results of a pageable endpoint.
     let page_iter = tmdb.page(&search_movies_endpoint);
 
-    let _: Result<Vec<MovieResult>, eiga::Error> = page_iter.collect();
+    // Print out the first five results for the search query "Ringu."
+    page_iter.take(5).filter_map(|result| result.ok()).for_each(
+        |result: MovieResult| {
+            println!("{} ({})", result.title, result.release_date)
+        },
+    );
 
     Ok(())
 }
