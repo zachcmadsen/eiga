@@ -1,14 +1,17 @@
 use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
+use ureq::serde_json::{json, Value};
 
-use eiga::{movie, search, Client, Endpoint, Tmdb};
+use eiga::{movie, search, Client, Endpoint, Error, PageIter, Pageable, Tmdb};
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {
     method: Option<&'a str>,
     path: Option<&'a str>,
     parameters: Option<&'a [(&'a str, &'a str)]>,
+    status: Option<u16>,
+    response: Option<Value>,
 }
 
 impl<'a> TestClientBuilder<'a> {
@@ -25,6 +28,8 @@ impl<'a> TestClientBuilder<'a> {
             method: self.method,
             path: self.path,
             parameters: self.parameters,
+            status: self.status,
+            response: self.response.clone(),
         }
     }
 
@@ -48,6 +53,18 @@ impl<'a> TestClientBuilder<'a> {
 
         self
     }
+
+    fn status(&mut self, status: u16) -> &mut TestClientBuilder<'a> {
+        self.status = Some(status);
+
+        self
+    }
+
+    fn response(&mut self, response: Value) -> &mut TestClientBuilder<'a> {
+        self.response = Some(response);
+
+        self
+    }
 }
 
 struct TestClient<'a> {
@@ -56,6 +73,8 @@ struct TestClient<'a> {
     method: Option<&'a str>,
     path: Option<&'a str>,
     parameters: Option<&'a [(&'a str, &'a str)]>,
+    status: Option<u16>,
+    response: Option<Value>,
 }
 
 impl<'a> TestClient<'a> {
@@ -64,11 +83,13 @@ impl<'a> TestClient<'a> {
             method: None,
             path: None,
             parameters: None,
+            status: None,
+            response: None,
         }
     }
 
     fn mock(&self) -> Mock {
-        self.server.mock(|mut when, then| {
+        self.server.mock(|mut when, mut then| {
             when = when.header("authorization", "Bearer <token>");
             if let Some(method) = self.method {
                 when = when.method(method);
@@ -82,13 +103,17 @@ impl<'a> TestClient<'a> {
                 }
             }
 
-            then.status(200);
+            // Default to 200 since most tests expect it.
+            then = then.status(self.status.unwrap_or(200));
+            if let Some(response) = self.response.clone() {
+                then.json_body(response);
+            }
         })
     }
 }
 
 impl<'a> Client for TestClient<'a> {
-    fn send<E, D>(&self, endpoint: &E) -> Result<D, eiga::Error>
+    fn send<E, D>(&self, endpoint: &E) -> Result<D, Error>
     where
         E: Endpoint,
         D: DeserializeOwned,
@@ -103,7 +128,7 @@ impl<'a> Client for TestClient<'a> {
         result
     }
 
-    fn ignore<E>(&self, endpoint: &E) -> Result<(), eiga::Error>
+    fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
     where
         E: Endpoint,
     {
@@ -116,10 +141,101 @@ impl<'a> Client for TestClient<'a> {
 
         Ok(())
     }
+
+    fn page<'b, E, D>(&'b self, endpoint: &'b E) -> PageIter<'b, Self, E, D>
+    where
+        E: Pageable,
+        D: DeserializeOwned,
+    {
+        todo!()
+    }
+}
+
+fn check<E>(client: TestClient, endpoint: E)
+where
+    E: Endpoint,
+{
+    let result = client.ignore(&endpoint);
+
+    assert!(
+        result.is_ok(),
+        "expected result to be `Ok`, got `Err`:\n{:#?}",
+        result
+    );
+}
+
+fn check_err<E>(
+    client: TestClient,
+    endpoint: E,
+    expected_code: u16,
+    expected_message: &str,
+) where
+    E: Endpoint,
+{
+    let result = client.ignore(&endpoint);
+
+    assert!(
+        matches!(
+            result,
+            Err(Error::Tmdb { code, ref message })
+                if code == expected_code
+                    && message == expected_message
+        ),
+        "expected result to be `Err(Error::Tmdb {{ code: {}, message: \"{}\" }})`, got:\n{:#?}",
+        expected_code,
+        expected_message,
+        result
+    );
 }
 
 #[test]
-fn movie_details() {
+fn unprocessable_entity() {
+    let expected_code = 422;
+    let expected_message = "page must be less than or equal to 500";
+
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("search/movie")
+        .parameters(&[("query", "Cruel Gun Story"), ("page", "600")])
+        .status(expected_code)
+        .response(json!({ "errors": [expected_message] }))
+        .build();
+
+    let search_movies_endpoint =
+        search::Movies::builder("Cruel Gun Story").page(600).build();
+
+    check_err(
+        test_client,
+        search_movies_endpoint,
+        expected_code,
+        expected_message,
+    );
+}
+
+#[test]
+fn not_found() {
+    let expected_code = 404;
+    let expected_message = "The resource you requested could not be found.";
+
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("movie/115572")
+        .status(expected_code)
+        .response(json!({"success":false, "status_code":34, "status_message": expected_message}))
+        .build();
+
+    let movie_details_endpoint = movie::Details::builder(115572).build();
+
+    check_err(
+        test_client,
+        movie_details_endpoint,
+        expected_code,
+        expected_message,
+    );
+}
+
+#[test]
+fn get_movie_details() {
     let test_client = TestClient::builder()
         .method("GET")
         .path("movie/500")
@@ -129,17 +245,11 @@ fn movie_details() {
     let movie_details_endpoint =
         movie::Details::builder(500).language("en-US").build();
 
-    let result = test_client.ignore(&movie_details_endpoint);
-
-    assert!(
-        result.is_ok(),
-        "expected result to be `Ok`, got `Err`:\n{:#?}",
-        result
-    );
+    check(test_client, movie_details_endpoint);
 }
 
 #[test]
-fn movie_alternative_titles() {
+fn get_movie_alternative_titles() {
     let test_client = TestClient::builder()
         .method("GET")
         .path("movie/500/alternative_titles")
@@ -149,17 +259,11 @@ fn movie_alternative_titles() {
     let movie_alternative_titles_endpoint =
         movie::AlternativeTitles::builder(500).country("US").build();
 
-    let result = test_client.ignore(&movie_alternative_titles_endpoint);
-
-    assert!(
-        result.is_ok(),
-        "expected result to be `Ok`, got `Err`:\n{:#?}",
-        result
-    );
+    check(test_client, movie_alternative_titles_endpoint);
 }
 
 #[test]
-fn movie_credits() {
+fn get_movie_credits() {
     let test_client = TestClient::builder()
         .method("GET")
         .path("movie/500/credits")
@@ -169,13 +273,7 @@ fn movie_credits() {
     let movie_credits_endpoint =
         movie::Credits::builder(500).language("en-US").build();
 
-    let result = test_client.ignore(&movie_credits_endpoint);
-
-    assert!(
-        result.is_ok(),
-        "expected result to be `Ok`, got `Err`:\n{:#?}",
-        result
-    );
+    check(test_client, movie_credits_endpoint);
 }
 
 #[test]
@@ -184,6 +282,7 @@ fn search_movies() {
         .method("GET")
         .path("search/movie")
         .parameters(&[
+            ("query", "Samurai Spy"),
             ("language", "en-US"),
             ("include_adult", "false"),
             ("region", "US"),
@@ -201,11 +300,5 @@ fn search_movies() {
         .primary_release_year(1965)
         .build();
 
-    let result = test_client.ignore(&search_movies_endpoint);
-
-    assert!(
-        result.is_ok(),
-        "expected result to be `Ok`, got `Err`:\n{:#?}",
-        result
-    );
+    check(test_client, search_movies_endpoint);
 }

@@ -7,7 +7,7 @@ use ureq::{
 };
 use url::Url;
 
-use crate::{Client, Endpoint, Error};
+use crate::{Client, Endpoint, Error, PageIter, Pageable};
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -15,6 +15,11 @@ const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 #[derive(Deserialize)]
 struct TmdbError {
     status_message: String,
+}
+
+#[derive(Deserialize)]
+struct UnprocessableEntityError {
+    errors: Vec<String>,
 }
 
 /// A builder for `Tmdb`.
@@ -111,8 +116,16 @@ impl Tmdb {
 
         match response {
             Ok(response) => Ok(response),
+            Err(Status(422, response)) => {
+                let error: UnprocessableEntityError = response.into_json()?;
+
+                Err(Error::Tmdb {
+                    code: 422,
+                    message: error.errors.join(", "),
+                })
+            }
             Err(Status(code, response)) => {
-                let error = response.into_json::<TmdbError>()?;
+                let error: TmdbError = response.into_json()?;
 
                 Err(Error::Tmdb {
                     code,
@@ -142,5 +155,13 @@ impl Client for Tmdb {
         self.call(endpoint)?;
 
         Ok(())
+    }
+
+    fn page<'a, E, D>(&'a self, endpoint: &'a E) -> PageIter<'a, Self, E, D>
+    where
+        E: Pageable,
+        D: DeserializeOwned,
+    {
+        PageIter::new(self, endpoint)
     }
 }

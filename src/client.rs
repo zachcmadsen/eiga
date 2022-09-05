@@ -1,6 +1,6 @@
 use serde::de::DeserializeOwned;
 
-use crate::{Endpoint, Error};
+use crate::{Endpoint, Error, PageIter, Pageable};
 
 /// A trait for objects that send requests.
 ///
@@ -39,4 +39,9 @@ pub trait Client {
     fn ignore<E>(&self, endpoint: &E) -> Result<(), Error>
     where
         E: Endpoint;
+
+    fn page<'a, E, D>(&'a self, endpoint: &'a E) -> PageIter<'a, Self, E, D>
+    where
+        E: Pageable,
+        D: DeserializeOwned;
 }
