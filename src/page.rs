@@ -24,7 +24,7 @@ where
 }
 
 pub trait Pageable: Endpoint {
-    fn page(&self) -> Option<u64>;
+    fn initial_page(&self) -> Option<u64>;
 }
 
 struct PageIterState<'a, C, E>
@@ -45,7 +45,7 @@ where
         PageIterState {
             client,
             endpoint,
-            next_page: endpoint.page().or(Some(1)),
+            next_page: endpoint.initial_page().or(Some(1)),
         }
     }
 }
