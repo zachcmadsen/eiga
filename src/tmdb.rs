@@ -23,6 +23,7 @@ struct UnprocessableEntityError {
 }
 
 /// A builder for `Tmdb`.
+#[derive(Debug)]
 pub struct TmdbBuilder<'a> {
     token: String,
     base_url: Option<&'a str>,
@@ -64,6 +65,7 @@ impl<'a> TmdbBuilder<'a> {
 }
 
 /// A client for sending requests to the TMDB API.
+#[derive(Debug)]
 pub struct Tmdb {
     base_url: Url,
     auth_header: Header,

@@ -41,7 +41,7 @@ impl<'a> ToCow<'a> for bool {
 ///
 /// assert_eq!(parameters.into_iter().count(), 2);
 /// ```
-#[derive(Clone)]
+#[derive(Debug)]
 pub struct QueryParameters<'a> {
     // TODO: Use tinyvec to save on allocations?
     parameters: Vec<(&'a str, Cow<'a, str>)>,

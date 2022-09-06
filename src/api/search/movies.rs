@@ -6,7 +6,7 @@ use http::Method;
 use crate::{Endpoint, Pageable, QueryParameters};
 
 /// The search movies endpoint.
-#[derive(Builder)]
+#[derive(Builder, Debug)]
 pub struct Movies<'a> {
     query: &'a str,
     language: Option<&'a str>,

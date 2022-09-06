@@ -6,7 +6,7 @@ use http::Method;
 use crate::{Endpoint, QueryParameters};
 
 /// The movie details endpoint.
-#[derive(Builder)]
+#[derive(Builder, Debug)]
 pub struct Details<'a> {
     id: u32,
     language: Option<&'a str>,

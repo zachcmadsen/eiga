@@ -5,7 +5,7 @@ use serde::{de::DeserializeOwned, Deserialize};
 use crate::{Client, Endpoint, Error};
 
 /// The response type of pageable endpoints.
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Page<T> {
     pub page: u64,
     pub results: Vec<T>,

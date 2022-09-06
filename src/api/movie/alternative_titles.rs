@@ -6,7 +6,7 @@ use http::Method;
 use crate::{Endpoint, QueryParameters};
 
 /// The alternative movie titles endpoint.
-#[derive(Builder)]
+#[derive(Builder, Debug)]
 pub struct AlternativeTitles<'a> {
     id: u32,
     country: Option<&'a str>,
