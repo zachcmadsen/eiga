@@ -13,13 +13,13 @@ Add `eiga` as a dependency in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-eiga = "0.1.0"
+eiga = "0.2.0"
 ```
 
 To send a request, the `Client` trait and `Tmdb`, the client, need to be in
 scope:
 
-```rs
+```rust
 use eiga::{Client, Tmdb};
 ```
 
@@ -28,7 +28,7 @@ use eiga::{Client, Tmdb};
 This example shows how to fetch details about a movie. You can find other
 examples in the [`examples`][examples] folder.
 
-```rs
+```rust
 use std::env;
 use std::error::Error;
 
