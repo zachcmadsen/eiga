@@ -15,8 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    let search_movies_endpoint =
-        search::Movies::builder("Black Lizard").build();
+    let search_movies_endpoint = search::Movies::new("Black Lizard");
 
     // For convenience, eiga provides a `Page` type. This is handy for cases
     // where you want to manually send a request to a pageable endpoint.

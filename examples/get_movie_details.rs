@@ -19,11 +19,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    // Build an endpoint to fetch details about "Tokyo Drifter" (1966).
+    // Build an endpoint to fetch details about "Tokyo Drifter" (1966). Each
+    // endpoint has setter methods to set optional query string parameters.
     let tokyo_drifter_id = 45706;
-    let movie_details_endpoint = movie::Details::builder(tokyo_drifter_id)
-        .language("en-US")
-        .build();
+    let movie_details_endpoint =
+        movie::Details::new(tokyo_drifter_id).language("en-US");
 
     // Send the request! Type annotations are required because `send` can
     // deserialize the response to any type that implements `Deserialize`.

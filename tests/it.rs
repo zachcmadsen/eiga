@@ -142,7 +142,7 @@ impl<'a> Client for TestClient<'a> {
         Ok(())
     }
 
-    fn page<'b, E, D>(&'b self, endpoint: &'b E) -> PageIter<'b, Self, E, D>
+    fn page<'b, E, D>(&'b self, _: &'b E) -> PageIter<'b, Self, E, D>
     where
         E: Pageable,
         D: DeserializeOwned,
@@ -202,7 +202,7 @@ fn unprocessable_entity() {
         .build();
 
     let search_movies_endpoint =
-        search::Movies::builder("Cruel Gun Story").page(600).build();
+        search::Movies::new("Cruel Gun Story").page(600);
 
     check_err(
         test_client,
@@ -224,7 +224,7 @@ fn not_found() {
         .response(json!({"success":false, "status_code":34, "status_message": expected_message}))
         .build();
 
-    let movie_details_endpoint = movie::Details::builder(115572).build();
+    let movie_details_endpoint = movie::Details::new(115572);
 
     check_err(
         test_client,
@@ -242,8 +242,7 @@ fn get_movie_details() {
         .parameters(&[("language", "en-US")])
         .build();
 
-    let movie_details_endpoint =
-        movie::Details::builder(500).language("en-US").build();
+    let movie_details_endpoint = movie::Details::new(500).language("en-US");
 
     check(test_client, movie_details_endpoint);
 }
@@ -257,7 +256,7 @@ fn get_movie_alternative_titles() {
         .build();
 
     let movie_alternative_titles_endpoint =
-        movie::AlternativeTitles::builder(500).country("US").build();
+        movie::AlternativeTitles::new(500).country("US");
 
     check(test_client, movie_alternative_titles_endpoint);
 }
@@ -270,8 +269,7 @@ fn get_movie_credits() {
         .parameters(&[("language", "en-US")])
         .build();
 
-    let movie_credits_endpoint =
-        movie::Credits::builder(500).language("en-US").build();
+    let movie_credits_endpoint = movie::Credits::new(500).language("en-US");
 
     check(test_client, movie_credits_endpoint);
 }
@@ -291,14 +289,13 @@ fn search_movies() {
         ])
         .build();
 
-    let search_movies_endpoint = search::Movies::builder("Samurai Spy")
+    let search_movies_endpoint = search::Movies::new("Samurai Spy")
         .language("en-US")
         .page(1)
         .include_adult(false)
         .region("US")
         .year(1965)
-        .primary_release_year(1965)
-        .build();
+        .primary_release_year(1965);
 
     check(test_client, search_movies_endpoint);
 }
