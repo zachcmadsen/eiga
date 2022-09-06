@@ -3,10 +3,10 @@
 //! pattern.
 //!
 //! Since this was designed to be used by `eiga`, it makes some assumptions:
-//! - The target struct has named fields
+//! - The target struct has named fields.
 //! - Optional fields have their type written as `Option<...>`. The macro won't
-//! recognize the `Option` type in any other form, e.g., `std::option::Option`
-//! - Optional fields represent query string parameters
+//! recognize the `Option` type in any other form, e.g., `std::option::Option`.
+//! - Optional fields represent query string parameters.
 //!
 //! # Example
 //!
