@@ -5,6 +5,7 @@ edition = "2021"
 authors = ["Zach Madsen <zachcmadsen@gmail.com>"]
 license = "MIT"
 description = "A builder derive macro for the `eiga` crate"
+documentation = "https://docs.rs/eiga_builder_derive"
 repository = "https://github.com/zachcmadsen/eiga"
 
 [lib]
