@@ -1,17 +1,19 @@
-//! A macro that implements a builder for a struct.
+//! This crate provides a derive macro that implements the
+//! [builder lite](https://matklad.github.io/2022/05/29/builder-lite.html)
+//! pattern.
 //!
-//! This was designed to be used by `eiga`, and thus makes a few assumptions:
+//! Since this was designed to be used by `eiga`, it makes some assumptions:
 //! - The target struct has named fields
 //! - Optional fields have their type written as `Option<...>`. The macro won't
-//! recognize the `Option` type in any other form, e.g., `std::option::Option`.
+//! recognize the `Option` type in any other form, e.g., `std::option::Option`
+//! - Optional fields represent query string parameters
 //!
 //! # Example
 //!
-//! Applying #[derive(Builder)] to
+//! Applying `#[derive(Builder)]` to
 //!
 //! ```
 //! # use eiga_builder_derive::Builder;
-//!
 //! #[derive(Builder)]
 //! struct Foo<'a> {
 //!     x: i32,
@@ -26,125 +28,58 @@
 //! #     x: i32,
 //! #     y: Option<&'a str>,
 //! # }
-//!
-//! /// A builder for `Foo`.
-//! struct FooBuilder<'a> {
-//!     x: i32,
-//!     y: Option<&'a str>,
-//! }
-//!
-//! impl<'a> FooBuilder<'a> {
-//!     fn new(x: i32) -> Self {
+//! impl<'a> Foo<'a> {
+//!     /// Constructs a new [`Foo`].
+//!     pub fn new(x: i32) -> Self {
 //!         Self {
 //!             x,
 //!             y: None,
 //!         }
 //!     }
 //!
-//!     /// Builds a new `Foo` based on the current configuration.
-//!     pub fn build(&self) -> Foo<'a> {
-//!         Foo {
-//!             x: self.x,
-//!             y: self.y
-//!         }
-//!     }
-//!
 //!     /// Sets the y query string parameter.
-//!     pub fn y(&mut self, y: &'a str) -> &mut Self {
+//!     pub fn y(mut self, y: &'a str) -> Self {
 //!         self.y = Some(y);
-//!
 //!         self
-//!     }
-//! }
-//!
-//! impl<'a> Foo<'a> {
-//!     /// Constructs a new `FooBuilder`.
-//!     pub fn builder(x: i32) -> FooBuilder<'a> {
-//!         FooBuilder::new(x)
 //!     }
 //! }
 //! ```
 
-use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, quote};
+use proc_macro2::TokenStream;
+use quote::quote;
 use syn::{
     parse_macro_input, Data, DeriveInput, Field, Fields, GenericArgument,
-    Generics, PathArguments, Type,
+    Ident, PathArguments, Type,
 };
 
-#[doc(hidden)]
 #[proc_macro_derive(Builder)]
 pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     let ident = &input.ident;
-    let builder_ident = &format_ident!("{}Builder", ident);
     let generics = &input.generics;
     let struct_data = &input.data;
 
-    let builder_struct =
-        builder_struct(ident, builder_ident, generics, struct_data);
-    let builder_impl =
-        builder_impl(ident, builder_ident, generics, struct_data);
-    let builder_method =
-        builder_method(ident, builder_ident, generics, struct_data);
+    let new_method = new_method(ident, struct_data);
+    let setters = setters(struct_data);
 
     let tokens = quote! {
-        #builder_struct
-        #builder_impl
-        #builder_method
+        impl #generics #ident #generics {
+            #new_method
+            #setters
+        }
     };
 
     tokens.into()
 }
 
-/// Returns a token stream of the builder struct definition.
-fn builder_struct(
-    ident: &Ident,
-    builder_ident: &Ident,
-    generics: &Generics,
-    struct_data: &Data,
-) -> TokenStream {
-    let comment = format!("A builder for `{}`", ident);
+/// Returns a token stream of the `new` method.
+///
+/// The parameters are the required fields of the struct described by
+/// `struct_data`.
+fn new_method(ident: &Ident, struct_data: &Data) -> TokenStream {
+    let comment = format!("Constructs a new [`{}`].", ident);
 
-    let builder_fields_iter = fields_iter(struct_data).map(|field| {
-        let ident = &field.ident;
-        let ty = &field.ty;
-
-        quote! { #ident: #ty }
-    });
-    let builder_fields = quote! { #(#builder_fields_iter),* };
-
-    quote! {
-        #[doc = #comment]
-        pub struct #builder_ident #generics {
-            #builder_fields
-        }
-    }
-}
-
-/// Returns a token stream of the builder struct implementation.
-fn builder_impl(
-    ident: &Ident,
-    builder_ident: &Ident,
-    generics: &Generics,
-    struct_data: &Data,
-) -> TokenStream {
-    let new_method = new_method(struct_data);
-    let build_method = build_method(ident, generics, struct_data);
-    let setters = setters(struct_data);
-
-    quote! {
-        impl #generics #builder_ident #generics {
-            #new_method
-            #build_method
-            #setters
-        }
-    }
-}
-
-/// Returns a token stream of the builder's `new` associated method.
-fn new_method(struct_data: &Data) -> TokenStream {
     let required_parameters_iter =
         required_fields_iter(struct_data).map(|field| {
             let ident = &field.ident;
@@ -166,7 +101,8 @@ fn new_method(struct_data: &Data) -> TokenStream {
     let fields = quote! { #(#fields_iter),* };
 
     quote! {
-        fn new(#required_parameters) -> Self {
+        #[doc = #comment]
+        pub fn new(#required_parameters) -> Self {
             Self {
                 #fields
             }
@@ -174,39 +110,12 @@ fn new_method(struct_data: &Data) -> TokenStream {
     }
 }
 
-/// Returns a token stream of the builder's `build` method.
-fn build_method(
-    ident: &Ident,
-    generics: &Generics,
-    struct_data: &Data,
-) -> TokenStream {
-    let comment = format!(
-        "Builds a new `{}` based on the current configuration.",
-        ident
-    );
-
-    let fields_iter = fields_iter(struct_data).map(|field| {
-        let ident = &field.ident;
-
-        quote! { #ident: self.#ident }
-    });
-    let fields = quote! { #(#fields_iter),* };
-
-    quote! {
-        #[doc = #comment]
-        pub fn build(&self) -> #ident #generics {
-            #ident {
-                #fields
-            }
-        }
-    }
-}
-
-/// Returns a token stream of the builder's setter methods.
+/// Returns a token stream of the setter methods.
 ///
-/// There's a setter for each optional field on the original struct.
-fn setters(data: &Data) -> TokenStream {
-    let setters_iter = optional_fields_iter(data).map(|field| {
+/// There's a setter for each optional field of the struct described by
+/// `struct_data`.
+fn setters(struct_data: &Data) -> TokenStream {
+    let setters_iter = optional_fields_iter(struct_data).map(|field| {
         // It's safe to unwrap here since optional_fields_iter iterates over
         // named fields only.
         let ident = field.ident.as_ref().unwrap();
@@ -215,49 +124,14 @@ fn setters(data: &Data) -> TokenStream {
 
         quote! {
             #[doc = #comment]
-            pub fn #ident(&mut self, #ident: #ty) -> &mut Self {
+            pub fn #ident(mut self, #ident: #ty) -> Self {
                 self.#ident = Some(#ident);
-
                 self
             }
         }
     });
 
     quote! { #(#setters_iter)* }
-}
-
-/// Returns a token stream of the original struct's `builder` method.
-fn builder_method(
-    ident: &Ident,
-    builder_ident: &Ident,
-    generics: &Generics,
-    struct_data: &Data,
-) -> TokenStream {
-    let comment = format!("Constructs a new `{}`.", builder_ident);
-
-    let parameters_iter = required_fields_iter(struct_data).map(|field| {
-        let ident = &field.ident;
-        let ty = &field.ty;
-
-        quote! { #ident: #ty }
-    });
-    let parameters = quote! { #(#parameters_iter),* };
-
-    let arguments_iter = required_fields_iter(struct_data).map(|field| {
-        let ident = &field.ident;
-
-        quote! { #ident }
-    });
-    let arguments = quote! { #(#arguments_iter),* };
-
-    quote! {
-        impl #generics #ident #generics {
-            #[doc = #comment]
-            pub fn builder(#parameters) -> #builder_ident #generics {
-                #builder_ident::new(#arguments)
-            }
-        }
-    }
 }
 
 /// Returns the first generic type argument of a type.
