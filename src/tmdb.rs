@@ -106,7 +106,7 @@ impl Tmdb {
             // TODO: Is it always safe to unwrap here?
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
-        for (parameter, value) in endpoint.parameters() {
+        for (parameter, value) in endpoint.parameters().iter() {
             request = request.query(parameter, value.as_str());
         }
 

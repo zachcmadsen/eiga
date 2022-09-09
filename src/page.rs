@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use serde::{de::DeserializeOwned, Deserialize};
 
-use crate::{Client, Endpoint, Error};
+use crate::{Client, Endpoint, Error, Parameters};
 
 /// The response type of pageable endpoints.
 #[derive(Debug, Deserialize)]
@@ -63,7 +63,7 @@ where
         self.endpoint.path()
     }
 
-    fn parameters(&self) -> crate::QueryParameters {
+    fn parameters(&self) -> Parameters {
         let mut parameters = self.endpoint.parameters();
         if let Some(next_page) = self.next_page {
             parameters.replace("page", next_page);

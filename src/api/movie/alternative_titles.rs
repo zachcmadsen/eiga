@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, QueryParameters};
+use crate::{Endpoint, Parameters};
 
 /// The alternative movie titles endpoint.
 #[derive(Builder, Debug)]
@@ -21,8 +21,8 @@ impl<'a> Endpoint for AlternativeTitles<'a> {
         format!("movie/{}/alternative_titles", self.id).into()
     }
 
-    fn parameters(&self) -> QueryParameters {
-        let mut parameters = QueryParameters::with_capacity(1);
+    fn parameters(&self) -> Parameters {
+        let mut parameters = Parameters::new();
         parameters.push("country", self.country);
 
         parameters
