@@ -1,29 +1,31 @@
 use std::borrow::Cow;
+use std::vec;
 
-/// A trait for converting a value to a `Cow`.
-pub trait ToCow<'a> {
-    fn to_cow(&self) -> Cow<'a, str>;
-}
+/// A query string parameter value.
+#[derive(Debug)]
+pub struct Value<'a>(Cow<'a, str>);
 
-impl<'a> ToCow<'a> for &'a str {
-    fn to_cow(&self) -> Cow<'a, str> {
-        (*self).into()
+impl<'a> Value<'a> {
+    pub fn as_str(&self) -> &str {
+        &self.0
     }
 }
 
-impl<'a> ToCow<'a> for u64 {
-    fn to_cow(&self) -> Cow<'a, str> {
-        format!("{}", self).into()
+impl<'a> From<bool> for Value<'a> {
+    fn from(value: bool) -> Self {
+        Value(value.to_string().into())
     }
 }
 
-impl<'a> ToCow<'a> for bool {
-    fn to_cow(&self) -> Cow<'a, str> {
-        if *self {
-            "true".into()
-        } else {
-            "false".into()
-        }
+impl<'a> From<&'a str> for Value<'a> {
+    fn from(value: &'a str) -> Self {
+        Value(value.into())
+    }
+}
+
+impl<'a> From<u64> for Value<'a> {
+    fn from(value: u64) -> Self {
+        Value(value.to_string().into())
     }
 }
 
@@ -43,8 +45,7 @@ impl<'a> ToCow<'a> for bool {
 /// ```
 #[derive(Debug)]
 pub struct QueryParameters<'a> {
-    // TODO: Use tinyvec to save on allocations?
-    parameters: Vec<(&'a str, Cow<'a, str>)>,
+    parameters: Vec<(&'a str, Value<'a>)>,
 }
 
 impl<'a> QueryParameters<'a> {
@@ -93,12 +94,12 @@ impl<'a> QueryParameters<'a> {
     ///
     /// assert_eq!(parameters.into_iter().count(), 3);
     /// ```
-    pub fn push<C>(&mut self, parameter: &'a str, value: Option<C>)
+    pub fn push<V>(&mut self, parameter: &'a str, value: Option<V>)
     where
-        C: ToCow<'a>,
+        V: Into<Value<'a>>,
     {
         if let Some(value) = value {
-            self.parameters.push((parameter, value.to_cow()));
+            self.parameters.push((parameter, value.into()));
         }
     }
 
@@ -117,23 +118,23 @@ impl<'a> QueryParameters<'a> {
     ///
     /// assert_eq!(parameters.into_iter().count(), 2);
     /// ```
-    pub fn replace<C>(&mut self, parameter: &'a str, value: C)
+    pub fn replace<V>(&mut self, parameter: &'a str, value: V)
     where
-        C: ToCow<'a>,
+        V: Into<Value<'a>>,
     {
         if let Some(index) =
             self.parameters.iter().position(|(p, _)| *p == parameter)
         {
-            self.parameters[index] = (parameter, value.to_cow());
+            self.parameters[index] = (parameter, value.into());
         } else {
-            self.parameters.push((parameter, value.to_cow()))
+            self.parameters.push((parameter, value.into()))
         }
     }
 }
 
 impl<'a> IntoIterator for QueryParameters<'a> {
-    type Item = (&'a str, Cow<'a, str>);
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type Item = (&'a str, Value<'a>);
+    type IntoIter = vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.parameters.into_iter()

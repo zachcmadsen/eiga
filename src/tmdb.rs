@@ -107,7 +107,7 @@ impl Tmdb {
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
         for (parameter, value) in endpoint.parameters() {
-            request = request.query(parameter, &value);
+            request = request.query(parameter, value.as_str());
         }
 
         let response = if let Some(body) = endpoint.body() {
