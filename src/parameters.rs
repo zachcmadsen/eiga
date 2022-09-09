@@ -128,6 +128,7 @@ impl<'a> Parameters<'a> {
 /// An immutable query string parameter iterator.
 ///
 /// This struct is created by the `iter` method on [`Parameters`].
+#[derive(Debug)]
 pub struct ParametersIter<'a> {
     iter: slice::Iter<'a, (&'a str, Value<'a>)>,
 }
