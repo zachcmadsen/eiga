@@ -5,7 +5,6 @@ edition = "2021"
 authors = ["Zach Madsen <zachcmadsen@gmail.com>"]
 license = "MIT"
 description = "A WIP TMDB API client"
-documentation = "https://docs.rs/eiga"
 repository = "https://github.com/zachcmadsen/eiga"
 readme = "README.md"
 keywords = ["TMDB"]

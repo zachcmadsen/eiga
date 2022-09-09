@@ -3,10 +3,10 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, QueryParameters};
+use crate::{Endpoint, Parameters};
 
 /// The movie credits endpoint.
-#[derive(Builder)]
+#[derive(Builder, Debug)]
 pub struct Credits<'a> {
     id: u32,
     language: Option<&'a str>,
@@ -21,8 +21,8 @@ impl<'a> Endpoint for Credits<'a> {
         format!("movie/{}/credits", self.id).into()
     }
 
-    fn parameters(&self) -> QueryParameters {
-        let mut parameters = QueryParameters::with_capacity(1);
+    fn parameters(&self) -> Parameters {
+        let mut parameters = Parameters::new();
         parameters.push("language", self.language);
 
         parameters

@@ -3,10 +3,10 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, Pageable, QueryParameters};
+use crate::{Endpoint, Pageable, Parameters};
 
 /// The search movies endpoint.
-#[derive(Builder)]
+#[derive(Builder, Debug)]
 pub struct Movies<'a> {
     query: &'a str,
     language: Option<&'a str>,
@@ -26,8 +26,8 @@ impl<'a> Endpoint for Movies<'a> {
         "search/movie".into()
     }
 
-    fn parameters(&self) -> QueryParameters {
-        let mut parameters = QueryParameters::with_capacity(7);
+    fn parameters(&self) -> Parameters {
+        let mut parameters = Parameters::new();
         parameters.push("query", Some(self.query));
         parameters.push("language", self.language);
         parameters.push("page", self.page);

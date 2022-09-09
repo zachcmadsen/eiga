@@ -23,6 +23,7 @@ struct UnprocessableEntityError {
 }
 
 /// A builder for `Tmdb`.
+#[derive(Debug)]
 pub struct TmdbBuilder<'a> {
     token: String,
     base_url: Option<&'a str>,
@@ -64,6 +65,7 @@ impl<'a> TmdbBuilder<'a> {
 }
 
 /// A client for sending requests to the TMDB API.
+#[derive(Debug)]
 pub struct Tmdb {
     base_url: Url,
     auth_header: Header,
@@ -104,8 +106,8 @@ impl Tmdb {
             // TODO: Is it always safe to unwrap here?
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
 
-        for (parameter, value) in endpoint.parameters() {
-            request = request.query(parameter, &value);
+        for (parameter, value) in endpoint.parameters().iter() {
+            request = request.query(parameter, value.as_str());
         }
 
         let response = if let Some(body) = endpoint.body() {

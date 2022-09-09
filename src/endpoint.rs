@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use http::Method;
 
-use crate::QueryParameters;
+use crate::Parameters;
 
 /// A trait for endpoint objects.
 pub trait Endpoint {
@@ -10,8 +10,8 @@ pub trait Endpoint {
 
     fn path(&self) -> Cow<'static, str>;
 
-    fn parameters(&self) -> QueryParameters {
-        QueryParameters::new()
+    fn parameters(&self) -> Parameters {
+        Parameters::new()
     }
 
     fn body(&self) -> Option<Vec<u8>> {
