@@ -27,6 +27,7 @@ pub trait Pageable: Endpoint {
     fn initial_page(&self) -> Option<u64>;
 }
 
+#[derive(Debug)]
 struct PageIterState<'a, C, E>
 where
     C: ?Sized,
@@ -73,6 +74,7 @@ where
     }
 }
 
+#[derive(Debug)]
 pub struct PageIter<'a, C, E, T>
 where
     C: ?Sized,
