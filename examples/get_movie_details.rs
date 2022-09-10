@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use eiga::{movie, Client, Tmdb};
 
-// eiga doesn't provide types for endpoint responses. Instead, users provider
+// eiga doesn't provide types for endpoint responses. Instead, users provide
 // their own structs to deserialize into.
 #[derive(Deserialize)]
 struct MovieDetails {
@@ -19,8 +19,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    // Build an endpoint to fetch details about "Tokyo Drifter" (1966). Each
-    // endpoint has setter methods to set optional query string parameters.
+    // Build an endpoint to get details about "Tokyo Drifter" (1966). Each
+    // endpoint has setter methods for optional query string parameters.
     let tokyo_drifter_id = 45706;
     let movie_details_endpoint =
         movie::Details::new(tokyo_drifter_id).language("en-US");
