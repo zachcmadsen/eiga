@@ -98,17 +98,14 @@ impl Tmdb {
     where
         E: Endpoint,
     {
-        let url = self.base_url.join(&endpoint.path())?;
+        let mut url = self.base_url.join(&endpoint.path())?;
+        endpoint.parameters().append_to_url(&mut url);
 
-        let mut request = self
+        let request = self
             .agent
             .request_url(endpoint.method().as_str(), &url)
             // TODO: Is it always safe to unwrap here?
             .set(self.auth_header.name(), self.auth_header.value().unwrap());
-
-        for (parameter, value) in endpoint.parameters().iter() {
-            request = request.query(parameter, value.as_str());
-        }
 
         let response = if let Some(body) = endpoint.body() {
             request.send_bytes(&body)

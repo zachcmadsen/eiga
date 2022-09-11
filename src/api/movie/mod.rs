@@ -1,3 +1,5 @@
+//! Movies API endpoints.
+
 mod alternative_titles;
 mod credits;
 mod details;

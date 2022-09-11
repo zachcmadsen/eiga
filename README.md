@@ -7,6 +7,8 @@
 
 `eiga` is a WIP TMDB API client.
 
+`eiga` is usable, but it doesn't cover much of the TMDB API yet.
+
 ## Usage
 
 Add `eiga` as a dependency in your `Cargo.toml`:
@@ -16,16 +18,9 @@ Add `eiga` as a dependency in your `Cargo.toml`:
 eiga = "0.2.0"
 ```
 
-To send a request, the `Client` trait and `Tmdb`, the client, need to be in
-scope:
-
-```rust
-use eiga::{Client, Tmdb};
-```
-
 ## Example
 
-This example shows how to fetch details about a movie. You can find other
+This example shows how to get details about a movie. You can find other
 examples in the [`examples`][examples] folder.
 
 ```rust
@@ -36,7 +31,7 @@ use serde::Deserialize;
 
 use eiga::{movie, Client, Tmdb};
 
-// eiga doesn't provide types for endpoint responses. Instead, users provider
+// eiga doesn't provide types for endpoint responses. Instead, users provide
 // their own structs to deserialize into.
 #[derive(Deserialize)]
 struct MovieDetails {
@@ -50,8 +45,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let token = env::var("TMDB_TOKEN")?;
     let tmdb = Tmdb::new(token);
 
-    // Build an endpoint to fetch details about "Tokyo Drifter" (1966). Each
-    // endpoint has setter methods to set optional query string parameters.
+    // Build an endpoint to get details about "Tokyo Drifter" (1966). Each
+    // endpoint has setter methods for optional query string parameters.
     let tokyo_drifter_id = 45706;
     let movie_details_endpoint =
         movie::Details::new(tokyo_drifter_id).language("en-US");
