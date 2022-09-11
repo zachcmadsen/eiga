@@ -7,6 +7,8 @@
 
 `eiga` is a WIP TMDB API client.
 
+`eiga` is usable, but it doesn't cover much of the TMDB API yet.
+
 ## Usage
 
 Add `eiga` as a dependency in your `Cargo.toml`:
