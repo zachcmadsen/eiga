@@ -15,7 +15,7 @@ Add `eiga` as a dependency in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-eiga = "0.2.0"
+eiga = "0.3.0"
 ```
 
 ## Example
