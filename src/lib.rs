@@ -52,7 +52,7 @@
 //! }
 //! ```
 
-// #![deny(missing_debug_implementations, missing_docs)]
+#![deny(missing_debug_implementations, missing_docs)]
 
 mod api;
 mod client;
