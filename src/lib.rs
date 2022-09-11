@@ -3,13 +3,13 @@
 //! # Usage
 //!
 //! To send a request you need the client, [`Tmdb`], and an endpoint struct.
-//! [`Tmdb`] has multiple methods for sending requests, and each of them takes
-//! an endpoint struct.
+//! [`Tmdb`] has multiple methods for sending requests. Each of them takes an
+//! endpoint struct.
 //!
-//! For each TMDB API endpoint there's a corresponding struct. An endpoint
-//! struct's module path corresponds to the endpoint's request path. For
-//! example, the struct for the endpoint with path
-//! `/movie/{movie_id}/alternative_titles` is [`movie::AlternativeTitles`].
+//! For each TMDB API endpoint there's a corresponding struct. An endpoint's
+//! request path corresponds to the struct's module path. For example, the
+//! struct for the endpoint with path `/movie/{movie_id}/alternative_titles`
+//! is [`movie::AlternativeTitles`].
 //!
 //! # Example
 //!
