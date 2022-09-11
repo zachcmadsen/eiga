@@ -8,6 +8,7 @@ description = "A WIP TMDB API client"
 repository = "https://github.com/zachcmadsen/eiga"
 readme = "README.md"
 keywords = ["TMDB"]
+categories = ["api-bindings", "web-programming::http-client"]
 
 [dependencies]
 eiga_builder_derive = { version = "0.2.0", path = "eiga_builder_derive" }
