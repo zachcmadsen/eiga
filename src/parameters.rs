@@ -1,5 +1,6 @@
 use std::borrow::Cow;
-use std::slice;
+
+use url::Url;
 
 /// A query string parameter value.
 #[derive(Debug)]
@@ -107,45 +108,9 @@ impl<'a> Parameters<'a> {
         }
     }
 
-    /// Returns an iterator over the parameters.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use eiga::Parameters;
-    ///
-    /// let mut parameters = Parameters::new();
-    /// parameters.push("year", Some(2001));
-    ///
-    /// let mut iter = parameters.iter().map(|(k, v)| (*k, v.as_str()));
-    /// assert_eq!(Some(("year", "2001")), iter.next());
-    /// assert_eq!(None, iter.next());
-    /// ```
-    pub fn iter(&self) -> ParametersIter<'_> {
-        ParametersIter::new(self)
-    }
-}
-
-/// An immutable query string parameter iterator.
-///
-/// This struct is created by the `iter` method on [`Parameters`].
-#[derive(Debug)]
-pub struct ParametersIter<'a> {
-    iter: slice::Iter<'a, (&'a str, Value<'a>)>,
-}
-
-impl<'a> ParametersIter<'a> {
-    fn new(parameters: &'a Parameters) -> ParametersIter<'a> {
-        ParametersIter {
-            iter: parameters.0.iter(),
-        }
-    }
-}
-
-impl<'a> Iterator for ParametersIter<'a> {
-    type Item = &'a (&'a str, Value<'a>);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+    /// Appends the collected parameters to the given URL.
+    pub fn append_to_url(&self, url: &mut Url) {
+        let mut pairs = url.query_pairs_mut();
+        pairs.extend_pairs(self.0.iter().map(|(k, v)| (k, v.as_str())));
     }
 }
