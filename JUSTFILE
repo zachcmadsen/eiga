@@ -9,5 +9,8 @@ example name:
 doc:
     cargo doc --no-deps --open
 
-test:
+it:
     cargo test --test it
+
+test:
+    cargo test
