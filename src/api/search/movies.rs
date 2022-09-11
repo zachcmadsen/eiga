@@ -40,7 +40,7 @@ impl<'a> Endpoint for Movies<'a> {
 }
 
 impl<'a> Pageable for Movies<'a> {
-    fn initial_page(&self) -> Option<u64> {
+    fn start_page(&self) -> Option<u64> {
         self.page
     }
 }

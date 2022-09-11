@@ -7,9 +7,13 @@ use crate::{Client, Endpoint, Error, Parameters};
 /// The response type of pageable endpoints.
 #[derive(Debug, Deserialize)]
 pub struct Page<T> {
+    /// The page number.
     pub page: u64,
+    /// The page results.
     pub results: Vec<T>,
+    /// The number of results in the page.
     pub total_results: usize,
+    /// The number of pages for the request.
     pub total_pages: u64,
 }
 
@@ -23,8 +27,10 @@ where
     }
 }
 
+/// A trait for pageable endpoint objects.
 pub trait Pageable: Endpoint {
-    fn initial_page(&self) -> Option<u64>;
+    /// Returns the starting page of the endpoint.
+    fn start_page(&self) -> Option<u64>;
 }
 
 #[derive(Debug)]
@@ -46,7 +52,7 @@ where
         PageIterState {
             client,
             endpoint,
-            next_page: endpoint.initial_page().or(Some(1)),
+            next_page: endpoint.start_page().or(Some(1)),
         }
     }
 }
@@ -74,6 +80,7 @@ where
     }
 }
 
+/// A pageable results iterator.
 #[derive(Debug)]
 pub struct PageIter<'a, C, E, T>
 where

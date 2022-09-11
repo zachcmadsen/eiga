@@ -6,6 +6,7 @@ use std::slice;
 pub struct Value<'a>(Cow<'a, str>);
 
 impl<'a> Value<'a> {
+    /// Returns a reference to the value as a string.
     pub fn as_str(&self) -> &str {
         &self.0
     }
