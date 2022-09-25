@@ -3,7 +3,10 @@ use httpmock::Mock;
 use serde::de::DeserializeOwned;
 use ureq::serde_json::{json, Value};
 
-use eiga::{movie, search, Client, Endpoint, Error, PageIter, Pageable, Tmdb};
+use eiga::{
+    configuration, movie, search, Client, Endpoint, Error, PageIter, Pageable,
+    Tmdb,
+};
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {
@@ -298,4 +301,28 @@ fn search_movies() {
         .primary_release_year(1965);
 
     check(test_client, search_movies_endpoint);
+}
+
+#[test]
+fn configuration_countries() {
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("configuration/countries")
+        .build();
+
+    let countries_endpoint = configuration::Countries::new();
+
+    check(test_client, countries_endpoint);
+}
+
+#[test]
+fn configuration_languages() {
+    let test_client = TestClient::builder()
+        .method("GET")
+        .path("configuration/languages")
+        .build();
+
+    let countries_endpoint = configuration::Languages::new();
+
+    check(test_client, countries_endpoint);
 }
