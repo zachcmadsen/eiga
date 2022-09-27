@@ -118,17 +118,17 @@ impl<'a> TestClient<'a> {
         let result = self.ignore(&endpoint);
 
         assert!(
-        matches!(
-            result,
-            Err(Error::Tmdb { code, ref message })
-                if code == expected_code
-                    && message == expected_message
-        ),
-        "expected result to be `Err(Error::Tmdb {{ code: {}, message: \"{}\" }})`, got:\n{:#?}",
-        expected_code,
-        expected_message,
-        result
-    );
+            matches!(
+                result,
+                Err(Error::Tmdb { code, ref message })
+                    if code == expected_code
+                        && message == expected_message
+            ),
+            "expected result to be `Err(Error::Tmdb {{ code: {}, message: \"{}\" }})`, got:\n{:#?}",
+            expected_code,
+            expected_message,
+            result
+        );
     }
 }
 
