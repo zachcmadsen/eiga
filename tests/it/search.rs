@@ -1,4 +1,4 @@
-use eiga::search;
+use eiga::{search, Country};
 
 use crate::TestClient;
 
@@ -8,7 +8,7 @@ fn get_movies_search() {
         .language("en-US")
         .page(1)
         .include_adult(false)
-        .region("US")
+        .region(Country::Us)
         .year(1965)
         .primary_release_year(1965);
 

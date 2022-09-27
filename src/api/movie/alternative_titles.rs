@@ -3,16 +3,16 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, Parameters};
+use crate::{Country, Endpoint, Parameters};
 
 /// The alternative movie titles endpoint.
 #[derive(Builder, Debug)]
-pub struct AlternativeTitles<'a> {
+pub struct AlternativeTitles {
     id: u32,
-    country: Option<&'a str>,
+    country: Option<Country>,
 }
 
-impl<'a> Endpoint for AlternativeTitles<'a> {
+impl Endpoint for AlternativeTitles {
     fn method(&self) -> Method {
         Method::GET
     }
@@ -23,7 +23,7 @@ impl<'a> Endpoint for AlternativeTitles<'a> {
 
     fn parameters(&self) -> Parameters {
         let mut parameters = Parameters::new();
-        parameters.push("country", self.country);
+        parameters.push("country", self.country.as_ref());
 
         parameters
     }

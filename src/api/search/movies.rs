@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, Pageable, Parameters};
+use crate::{Country, Endpoint, Pageable, Parameters};
 
 /// The search movies endpoint.
 #[derive(Builder, Debug)]
@@ -12,7 +12,7 @@ pub struct Movies<'a> {
     language: Option<&'a str>,
     page: Option<u64>,
     include_adult: Option<bool>,
-    region: Option<&'a str>,
+    region: Option<Country>,
     year: Option<u64>,
     primary_release_year: Option<u64>,
 }
@@ -32,7 +32,7 @@ impl<'a> Endpoint for Movies<'a> {
         parameters.push("language", self.language);
         parameters.push("page", self.page);
         parameters.push("include_adult", self.include_adult);
-        parameters.push("region", self.region);
+        parameters.push("region", self.region.as_ref());
         parameters.push("year", self.year);
         parameters.push("primary_release_year", self.primary_release_year);
         parameters

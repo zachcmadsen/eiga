@@ -1,4 +1,4 @@
-use eiga::movie;
+use eiga::{movie, Country};
 
 use crate::TestClient;
 
@@ -16,7 +16,7 @@ fn get_details() {
 #[test]
 fn get_alternative_titles() {
     let movie_alternative_titles_endpoint =
-        movie::AlternativeTitles::new(500).country("US");
+        movie::AlternativeTitles::new(500).country(Country::Us);
 
     TestClient::new()
         .method("GET")

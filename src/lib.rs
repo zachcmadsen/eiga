@@ -56,6 +56,7 @@
 
 mod api;
 mod client;
+mod country;
 mod endpoint;
 mod error;
 mod page;
@@ -64,6 +65,7 @@ mod tmdb;
 
 pub use api::*;
 pub use client::Client;
+pub use country::Country;
 pub use endpoint::Endpoint;
 pub use error::Error;
 pub use page::{Page, PageIter, Pageable};

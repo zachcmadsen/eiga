@@ -2,6 +2,8 @@ use std::borrow::Cow;
 
 use url::Url;
 
+use crate::Country;
+
 /// A query string parameter value.
 #[derive(Debug)]
 pub struct Value<'a>(Cow<'a, str>);
@@ -16,6 +18,12 @@ impl<'a> Value<'a> {
 impl<'a> From<bool> for Value<'a> {
     fn from(value: bool) -> Self {
         Value(value.to_string().into())
+    }
+}
+
+impl<'a> From<&Country> for Value<'a> {
+    fn from(value: &Country) -> Self {
+        Value(format!("{}", value).into())
     }
 }
 
