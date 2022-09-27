@@ -1,15 +1,16 @@
-use eiga::{movie, Country};
+use eiga::{movie, Country, Language};
 
 use crate::TestClient;
 
 #[test]
 fn get_details() {
-    let movie_details_endpoint = movie::Details::new(500).language("en-US");
+    let movie_details_endpoint =
+        movie::Details::new(500).language(Language::En);
 
     TestClient::new()
         .method("GET")
         .path("movie/500")
-        .parameters(&[("language", "en-US")])
+        .parameters(&[("language", "en")])
         .check(movie_details_endpoint);
 }
 
@@ -27,11 +28,12 @@ fn get_alternative_titles() {
 
 #[test]
 fn get_credits() {
-    let movie_credits_endpoint = movie::Credits::new(500).language("en-US");
+    let movie_credits_endpoint =
+        movie::Credits::new(500).language(Language::En);
 
     TestClient::new()
         .method("GET")
         .path("movie/500/credits")
-        .parameters(&[("language", "en-US")])
+        .parameters(&[("language", "en")])
         .check(movie_credits_endpoint);
 }

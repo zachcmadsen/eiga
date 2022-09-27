@@ -19,7 +19,7 @@
 //!
 //! use serde::Deserialize;
 //!
-//! use eiga::{movie, Client, Tmdb};
+//! use eiga::{movie, Client, Language, Tmdb};
 //!
 //! // eiga doesn't provide types for endpoint responses. Instead, users provide
 //! // their own structs to deserialize into.
@@ -39,7 +39,7 @@
 //!     // endpoint has setter methods to set optional query string parameters.
 //!     let tokyo_drifter_id = 45706;
 //!     let movie_details_endpoint =
-//!         movie::Details::new(tokyo_drifter_id).language("en-US");
+//!         movie::Details::new(tokyo_drifter_id).language(Language::En);
 //!     
 //!     // Send the request! Type annotations are required because `send` can
 //!     // deserialize the response to any type that implements `Deserialize`.
@@ -59,6 +59,7 @@ mod client;
 mod country;
 mod endpoint;
 mod error;
+mod language;
 mod page;
 mod parameters;
 mod tmdb;
@@ -68,6 +69,7 @@ pub use client::Client;
 pub use country::Country;
 pub use endpoint::Endpoint;
 pub use error::Error;
+pub use language::Language;
 pub use page::{Page, PageIter, Pageable};
 pub use parameters::{Parameters, Value};
 pub use tmdb::Tmdb;

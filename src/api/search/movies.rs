@@ -3,13 +3,13 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Country, Endpoint, Pageable, Parameters};
+use crate::{Country, Endpoint, Language, Pageable, Parameters};
 
 /// The search movies endpoint.
 #[derive(Builder, Debug)]
 pub struct Movies<'a> {
     query: &'a str,
-    language: Option<&'a str>,
+    language: Option<Language>,
     page: Option<u64>,
     include_adult: Option<bool>,
     region: Option<Country>,
@@ -29,7 +29,7 @@ impl<'a> Endpoint for Movies<'a> {
     fn parameters(&self) -> Parameters {
         let mut parameters = Parameters::new();
         parameters.push("query", Some(self.query));
-        parameters.push("language", self.language);
+        parameters.push("language", self.language.as_ref());
         parameters.push("page", self.page);
         parameters.push("include_adult", self.include_adult);
         parameters.push("region", self.region.as_ref());

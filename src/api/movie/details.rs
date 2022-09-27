@@ -3,16 +3,16 @@ use std::borrow::Cow;
 use eiga_builder_derive::Builder;
 use http::Method;
 
-use crate::{Endpoint, Parameters};
+use crate::{Endpoint, Language, Parameters};
 
 /// The movie details endpoint.
 #[derive(Builder, Debug)]
-pub struct Details<'a> {
+pub struct Details {
     id: u32,
-    language: Option<&'a str>,
+    language: Option<Language>,
 }
 
-impl<'a> Endpoint for Details<'a> {
+impl Endpoint for Details {
     fn method(&self) -> Method {
         Method::GET
     }
@@ -23,7 +23,7 @@ impl<'a> Endpoint for Details<'a> {
 
     fn parameters(&self) -> Parameters {
         let mut parameters = Parameters::new();
-        parameters.push("language", self.language);
+        parameters.push("language", self.language.as_ref());
 
         parameters
     }

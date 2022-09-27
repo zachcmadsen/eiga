@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use url::Url;
 
-use crate::Country;
+use crate::{Country, Language};
 
 /// A query string parameter value.
 #[derive(Debug)]
@@ -16,26 +16,32 @@ impl<'a> Value<'a> {
 }
 
 impl<'a> From<bool> for Value<'a> {
-    fn from(value: bool) -> Self {
-        Value(value.to_string().into())
+    fn from(b: bool) -> Self {
+        Value(b.to_string().into())
     }
 }
 
 impl<'a> From<&Country> for Value<'a> {
-    fn from(value: &Country) -> Self {
-        Value(format!("{}", value).into())
+    fn from(country: &Country) -> Self {
+        Value(format!("{}", country).into())
+    }
+}
+
+impl<'a> From<&Language> for Value<'a> {
+    fn from(language: &Language) -> Self {
+        Value(format!("{}", language).into())
     }
 }
 
 impl<'a> From<&'a str> for Value<'a> {
-    fn from(value: &'a str) -> Self {
-        Value(value.into())
+    fn from(s: &'a str) -> Self {
+        Value(s.into())
     }
 }
 
 impl<'a> From<u64> for Value<'a> {
-    fn from(value: u64) -> Self {
-        Value(value.to_string().into())
+    fn from(u: u64) -> Self {
+        Value(u.to_string().into())
     }
 }
 
