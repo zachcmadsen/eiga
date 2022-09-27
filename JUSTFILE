@@ -6,6 +6,8 @@ default:
 build: clippy
     cargo build
 
+check: fmt clippy build doc test
+
 clippy:
     cargo clippy
 
@@ -21,7 +23,7 @@ fmt:
 it:
     cargo test --test it
 
-package: fmt clippy build doc test
+package: check
     cargo package
 
 test:
