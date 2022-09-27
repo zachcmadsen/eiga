@@ -1,12 +1,13 @@
+mod configuration;
+mod error;
+mod movie;
+mod search;
+
+use eiga::{Client, Endpoint, Error, PageIter, Pageable, Tmdb};
 use httpmock::prelude::*;
 use httpmock::Mock;
 use serde::de::DeserializeOwned;
-use ureq::serde_json::{json, Value};
-
-use eiga::{
-    configuration, movie, search, Client, Endpoint, Error, PageIter, Pageable,
-    Tmdb,
-};
+use ureq::serde_json::Value;
 
 /// A builder for `TestClient`.
 struct TestClientBuilder<'a> {
@@ -189,140 +190,4 @@ fn check_err<E>(
         expected_message,
         result
     );
-}
-
-#[test]
-fn unprocessable_entity() {
-    let expected_code = 422;
-    let expected_message = "page must be less than or equal to 500";
-
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("search/movie")
-        .parameters(&[("query", "Cruel Gun Story"), ("page", "600")])
-        .status(expected_code)
-        .response(json!({ "errors": [expected_message] }))
-        .build();
-
-    let search_movies_endpoint =
-        search::Movies::new("Cruel Gun Story").page(600);
-
-    check_err(
-        test_client,
-        search_movies_endpoint,
-        expected_code,
-        expected_message,
-    );
-}
-
-#[test]
-fn not_found() {
-    let expected_code = 404;
-    let expected_message = "The resource you requested could not be found.";
-
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("movie/115572")
-        .status(expected_code)
-        .response(json!({"success":false, "status_code":34, "status_message": expected_message}))
-        .build();
-
-    let movie_details_endpoint = movie::Details::new(115572);
-
-    check_err(
-        test_client,
-        movie_details_endpoint,
-        expected_code,
-        expected_message,
-    );
-}
-
-#[test]
-fn get_movie_details() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("movie/500")
-        .parameters(&[("language", "en-US")])
-        .build();
-
-    let movie_details_endpoint = movie::Details::new(500).language("en-US");
-
-    check(test_client, movie_details_endpoint);
-}
-
-#[test]
-fn get_movie_alternative_titles() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("movie/500/alternative_titles")
-        .parameters(&[("country", "US")])
-        .build();
-
-    let movie_alternative_titles_endpoint =
-        movie::AlternativeTitles::new(500).country("US");
-
-    check(test_client, movie_alternative_titles_endpoint);
-}
-
-#[test]
-fn get_movie_credits() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("movie/500/credits")
-        .parameters(&[("language", "en-US")])
-        .build();
-
-    let movie_credits_endpoint = movie::Credits::new(500).language("en-US");
-
-    check(test_client, movie_credits_endpoint);
-}
-
-#[test]
-fn search_movies() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("search/movie")
-        .parameters(&[
-            ("query", "Samurai Spy"),
-            ("language", "en-US"),
-            ("include_adult", "false"),
-            ("region", "US"),
-            ("year", "1965"),
-            ("primary_release_year", "1965"),
-        ])
-        .build();
-
-    let search_movies_endpoint = search::Movies::new("Samurai Spy")
-        .language("en-US")
-        .page(1)
-        .include_adult(false)
-        .region("US")
-        .year(1965)
-        .primary_release_year(1965);
-
-    check(test_client, search_movies_endpoint);
-}
-
-#[test]
-fn configuration_countries() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("configuration/countries")
-        .build();
-
-    let countries_endpoint = configuration::Countries::new();
-
-    check(test_client, countries_endpoint);
-}
-
-#[test]
-fn configuration_languages() {
-    let test_client = TestClient::builder()
-        .method("GET")
-        .path("configuration/languages")
-        .build();
-
-    let countries_endpoint = configuration::Languages::new();
-
-    check(test_client, countries_endpoint);
 }
