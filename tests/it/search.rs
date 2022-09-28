@@ -1,14 +1,14 @@
-use eiga::search;
+use eiga::{search, Country, Language};
 
 use crate::TestClient;
 
 #[test]
 fn get_movies_search() {
     let search_movies_endpoint = search::Movies::new("Samurai Spy")
-        .language("en-US")
+        .language(Language::En)
         .page(1)
         .include_adult(false)
-        .region("US")
+        .region(Country::Us)
         .year(1965)
         .primary_release_year(1965);
 
@@ -17,7 +17,7 @@ fn get_movies_search() {
         .path("search/movie")
         .parameters(&[
             ("query", "Samurai Spy"),
-            ("language", "en-US"),
+            ("language", "en"),
             ("include_adult", "false"),
             ("region", "US"),
             ("year", "1965"),

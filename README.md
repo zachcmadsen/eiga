@@ -29,7 +29,7 @@ use std::error::Error;
 
 use serde::Deserialize;
 
-use eiga::{movie, Client, Tmdb};
+use eiga::{movie, Client, Language, Tmdb};
 
 // eiga doesn't provide types for endpoint responses. Instead, users provide
 // their own structs to deserialize into.
@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // endpoint has setter methods for optional query string parameters.
     let tokyo_drifter_id = 45706;
     let movie_details_endpoint =
-        movie::Details::new(tokyo_drifter_id).language("en-US");
+        movie::Details::new(tokyo_drifter_id).language(Language::En);
 
     // Send the request! Type annotations are required because `send` can
     // deserialize the response to any type that implements `Deserialize`.
@@ -65,10 +65,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 ## Acknowledgements
 
 - The design of `eiga` is mostly based on the design of the
-[`gitlab`][gitlab_crate] crate. There's a nice writeup on its design
-[here][gitlab_design].
+  [`gitlab`][gitlab_crate] crate. There's a nice writeup on its design
+  [here][gitlab_design].
 
 <!-- Badges -->
+
 [ci_badge]: https://github.com/zachcmadsen/eiga/workflows/CI/badge.svg?branch=main
 [ci]: https://github.com/zachcmadsen/eiga/actions?query=branch%3Amain
 [crate_badge]: https://img.shields.io/crates/v/eiga.svg
@@ -79,6 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 [license]: https://github.com/zachcmadsen/eiga/blob/main/LICENSE
 
 <!-- Links -->
+
 [examples]: https://github.com/zachcmadsen/eiga/tree/main/examples
 [gitlab_crate]: https://crates.io/crates/gitlab
 [gitlab_design]: https://plume.benboeckel.net/~/JustAnotherBlog/designing-rust-bindings-for-rest-ap-is

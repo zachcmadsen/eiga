@@ -14,7 +14,7 @@ clippy:
 doc:
     cargo doc --no-deps
 
-example name:
+ex name:
     cargo run --example {{name}}
 
 fmt:
