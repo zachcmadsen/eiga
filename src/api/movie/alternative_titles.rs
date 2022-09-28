@@ -8,7 +8,7 @@ use crate::{Country, Endpoint, Parameters};
 /// The alternative movie titles endpoint.
 #[derive(Builder, Debug)]
 pub struct AlternativeTitles {
-    id: u32,
+    id: u64,
     country: Option<Country>,
 }
 

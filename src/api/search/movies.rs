@@ -10,11 +10,11 @@ use crate::{Country, Endpoint, Language, Pageable, Parameters};
 pub struct Movies<'a> {
     query: &'a str,
     language: Option<Language>,
-    page: Option<u64>,
+    page: Option<u16>,
     include_adult: Option<bool>,
     region: Option<Country>,
-    year: Option<u64>,
-    primary_release_year: Option<u64>,
+    year: Option<u16>,
+    primary_release_year: Option<u16>,
 }
 
 impl<'a> Endpoint for Movies<'a> {
@@ -40,7 +40,7 @@ impl<'a> Endpoint for Movies<'a> {
 }
 
 impl<'a> Pageable for Movies<'a> {
-    fn start_page(&self) -> Option<u64> {
+    fn start_page(&self) -> Option<u16> {
         self.page
     }
 }

@@ -8,7 +8,7 @@ use crate::{Endpoint, Language, Parameters};
 /// The movie details endpoint.
 #[derive(Builder, Debug)]
 pub struct Details {
-    id: u32,
+    id: u64,
     language: Option<Language>,
 }
 

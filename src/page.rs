@@ -8,13 +8,13 @@ use crate::{Client, Endpoint, Error, Parameters};
 #[derive(Debug, Deserialize)]
 pub struct Page<T> {
     /// The page number.
-    pub page: u64,
+    pub page: u16,
     /// The page results.
     pub results: Vec<T>,
     /// The number of results in the page.
     pub total_results: usize,
     /// The number of pages for the request.
-    pub total_pages: u64,
+    pub total_pages: u16,
 }
 
 impl<D> Page<D>
@@ -30,7 +30,7 @@ where
 /// A trait for pageable endpoint objects.
 pub trait Pageable: Endpoint {
     /// Returns the starting page of the endpoint.
-    fn start_page(&self) -> Option<u64>;
+    fn start_page(&self) -> Option<u16>;
 }
 
 #[derive(Debug)]
@@ -40,7 +40,7 @@ where
 {
     client: &'a C,
     endpoint: &'a E,
-    next_page: Option<u64>,
+    next_page: Option<u16>,
 }
 
 impl<'a, C, E> PageIterState<'a, C, E>

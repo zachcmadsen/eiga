@@ -39,8 +39,8 @@ impl<'a> From<&'a str> for Value<'a> {
     }
 }
 
-impl<'a> From<u64> for Value<'a> {
-    fn from(u: u64) -> Self {
+impl<'a> From<u16> for Value<'a> {
+    fn from(u: u16) -> Self {
         Value(u.to_string().into())
     }
 }
