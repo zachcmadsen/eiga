@@ -1,3 +1,7 @@
+mod error;
+
+pub use error::Result;
+
 use std::borrow::Cow;
 
 use reqwest::{
@@ -5,6 +9,8 @@ use reqwest::{
     Client, Method, Url,
 };
 use serde::{de::DeserializeOwned, Serialize};
+
+use crate::error::Error;
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3/";
 
@@ -32,7 +38,7 @@ impl TmdbClient {
         TmdbClient { base_url, client }
     }
 
-    pub async fn send<D, E>(&self, endpoint: E) -> D
+    pub async fn send<D, E>(&self, endpoint: E) -> Result<D>
     where
         D: DeserializeOwned,
         E: Endpoint,
@@ -46,22 +52,27 @@ impl TmdbClient {
             .query(&endpoint.parameters())
             .send()
             .await
-            .unwrap();
+            .map_err(Error::Request)?;
+
+        if !response.status().is_success() {
+            println!("{:#?}", response.text().await.unwrap());
+            todo!();
+        }
 
         println!("{response:#?}");
 
-        response.json::<D>().await.unwrap()
+        response.json::<D>().await.map_err(Error::Deserialize)
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct MovieDetails<'a> {
+pub struct GetMovieDetails<'a> {
     pub movie_id: u64,
-    pub parameters: MovieDetailsParameters<'a>,
+    pub parameters: GetMovieDetailsParameters<'a>,
 }
 
 #[derive(Clone, Debug, Serialize)]
-pub struct MovieDetailsParameters<'a> {
+pub struct GetMovieDetailsParameters<'a> {
     pub language: Option<&'a str>,
     pub append_to_response: Option<&'a str>,
 }
@@ -78,8 +89,8 @@ pub trait Endpoint {
     fn parameters(&self) -> &Self::Parameters;
 }
 
-impl<'a> Endpoint for MovieDetails<'a> {
-    type Parameters = MovieDetailsParameters<'a>;
+impl<'a> Endpoint for GetMovieDetails<'a> {
+    type Parameters = GetMovieDetailsParameters<'a>;
 
     fn parameters(&self) -> &Self::Parameters {
         &self.parameters

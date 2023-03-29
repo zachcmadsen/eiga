@@ -1,4 +1,4 @@
-use eiga::{MovieDetails, TmdbClient};
+use eiga::{GetMovieDetails, TmdbClient};
 
 #[derive(Debug, serde::Deserialize)]
 struct Target {
@@ -9,9 +9,9 @@ struct Target {
 
 #[tokio::main]
 async fn main() {
-    let md = MovieDetails {
-        movie_id: 45706,
-        parameters: eiga::MovieDetailsParameters {
+    let md = GetMovieDetails {
+        movie_id: 999999999999,
+        parameters: eiga::GetMovieDetailsParameters {
             language: Some("en"),
             append_to_response: None,
         },
@@ -19,7 +19,7 @@ async fn main() {
 
     let client = TmdbClient::new("");
 
-    let response_body: Target = client.send(md).await;
+    let response_body: Target = client.send(md).await.unwrap();
 
     println!("{response_body:#?}");
 }
