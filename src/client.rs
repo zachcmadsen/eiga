@@ -1,6 +1,42 @@
+use http::{Request, Response};
+use hyper::{client::HttpConnector, Body};
 use serde::de::DeserializeOwned;
+use tower::{
+    util::{BoxCloneService, BoxService},
+    BoxError, Service, ServiceExt,
+};
 
 use crate::{Endpoint, Error, PageIter, Pageable};
+
+pub struct Client2 {
+    service: BoxCloneService<Request<Body>, Response<Body>, hyper::Error>,
+}
+
+impl Client2 {
+    pub fn new() -> Client2 {
+        let client = hyper::Client::builder().build(HttpConnector::new());
+
+        Self {
+            service: BoxCloneService::new(client),
+        }
+    }
+
+    pub async fn raw<T>(&self, request: Request<Body>) -> () {
+        let resp = self
+            .service
+            .clone()
+            .ready()
+            .await
+            .unwrap()
+            .call(request)
+            .await
+            .unwrap();
+
+        let bytes = hyper::body::to_bytes(resp.into_body()).await.unwrap();
+
+        // serde_json::from_slice(&full).map_err(crate::error::decode)
+    }
+}
 
 /// A trait for sending requests to endpoints.
 ///
